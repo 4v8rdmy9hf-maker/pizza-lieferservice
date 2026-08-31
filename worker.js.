@@ -1,0 +1,58 @@
+self.addEventListener("push", event => {
+  let data = {
+    title: "Pizzeria TC",
+    body: "Neue Nachricht"
+  };
+
+  try {
+    if (event.data) {
+      data = {
+        ...data,
+        ...event.data.json()
+      };
+    }
+  } catch (error) {
+    console.error("Push-Daten konnten nicht gelesen werden:", error);
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(
+      data.title,
+      {
+        body: data.body,
+        icon: "/icon-192.png",
+        badge: "/icon-192.png",
+        data: data.data || {},
+        vibrate: [
+          250,
+          100,
+          250,
+          100,
+          400
+        ],
+        requireInteraction: true
+      }
+    )
+  );
+});
+
+self.addEventListener("notificationclick", event => {
+  event.notification.close();
+
+  event.waitUntil(
+    clients
+      .matchAll({
+        type: "window",
+        includeUncontrolled: true
+      })
+      .then(openClients => {
+        if (openClients.length > 0) {
+          return openClients[0].focus();
+        }
+
+        return clients.openWindow(
+          "/?admin=1"
+        );
+      })
+  );
+});
