@@ -96,7 +96,7 @@ footer{max-width:980px;margin:auto;padding:30px 18px 50px;color:#888;border-top:
 </section>
 
 <section class="section">
-<div class="notice"><b>Allergene & Zusatzstoffe</b><br>A: Glutenhaltiges Getreide (Weizen) · D: Fisch · G: Milch (einschl. Laktose) · 2: mit Konservierungsstoff · 3: mit Antioxidationsmittel.</div>
+<div class="notice"><b>Mindestbestellwert: 25,00 €</b><br><br><b>Allergene & Zusatzstoffe</b><br>A: Glutenhaltiges Getreide (Weizen) · D: Fisch · G: Milch (einschl. Laktose) · 2: mit Konservierungsstoff · 3: mit Antioxidationsmittel.</div>
 </section>
 </main>
 
@@ -215,17 +215,17 @@ const auth=getAuth(app);
 const ADMIN="Tahayman10@gmail.com";
 
 const MENU=[
-["p1","Pizza","Margherita","Tomatensoße, Käse",10.5],
-["p2","Pizza","Schinken Pilze","Schinken, Champignons",12.5],
-["p3","Pizza","Rucola","Rucola, Parmaschinken",14],
-["p4","Pizza","Salami","Salami",12],
-["p5","Pizza","Peperoni","Peperonisalami",12.5],
-["p6","Pizza","Tonno","Thunfisch, Zwiebel",13],
-["p7","Pizza","Sucuk","Sucuk",12.5],
-["p8","Pizza","Mix","Salami, Schinken, Pilze",14],
-["p9","Pizza","4 Käse","Vier verschiedene Käsesorten",14],
-["p10","Pizza","Vegetarisch","Verschiedenes Gemüse",13.5],
-["p11","Pizza","Halal","Mit Halal Salami",12.5],
+["p1","Pizza","Margherita","Tomatensoße, Käse",10],
+["p2","Pizza","Schinken Pilze","Schinken, Champignons",11.5],
+["p3","Pizza","Rucola","Rucola, Parmaschinken",13],
+["p4","Pizza","Salami","Salami",11],
+["p5","Pizza","Peperoni","Peperonisalami",11.5],
+["p6","Pizza","Tonno","Thunfisch, Zwiebel",12],
+["p7","Pizza","Sucuk","Sucuk",11.5],
+["p8","Pizza","Mix","Salami, Schinken, Pilze",13],
+["p9","Pizza","4 Käse","Vier verschiedene Käsesorten",13],
+["p10","Pizza","Vegetarisch","Verschiedenes Gemüse",12.5],
+["p11","Pizza","Halal","Mit Halal Salami",11.5],
 
 ["b1","Beilagen","Pommes","Portion Pommes",3.5],
 ["b2","Beilagen","Chicken Nuggets","6 Stück",4.2],
@@ -261,7 +261,7 @@ let cat="Pizza";
 
 let settings={
 allowOrders:true,
-minimumOrder:0,
+minimumOrder:25,
 deliveryFee:0,
 allowedPostcodes:[]
 };
@@ -443,6 +443,11 @@ message("Der Warenkorb ist leer.");
 return;
 }
 
+if(sub()<25){
+message("Der Mindestbestellwert beträgt 25,00 €.");
+return;
+}
+
 $("#drawer").classList.remove("show");
 
 $("#ageCheck").classList.toggle(
@@ -480,6 +485,8 @@ settings={...settings,...s.data()};
 console.log("Settings:",err);
 }
 
+settings.minimumOrder=25;
+
 renderStatus();
 renderCart();
 }
@@ -498,8 +505,8 @@ message("Bestellungen sind aktuell geschlossen. Bitte innerhalb der Öffnungszei
 return;
 }
 
-if(sub()<Number(settings.minimumOrder||0)){
-message("Der Mindestbestellwert wurde noch nicht erreicht.");
+if(sub()<25){
+message("Der Mindestbestellwert beträgt 25,00 €.");
 return;
 }
 
