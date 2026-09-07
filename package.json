@@ -1,5 +1,5 @@
 {
-  "name": "pizzeria-tc-netlify-functions",
+  "name": "pizzeria-la-piazza-netlify-functions",
   "private": true,
   "dependencies": {
     "firebase-admin": "^13.0.0",
