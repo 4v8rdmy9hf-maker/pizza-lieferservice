@@ -1,106 +1,188 @@
 const crypto = require("crypto");
+
 const {
   db,
   json
 } = require("./_firebase");
 
+
 exports.handler = async event => {
-  if (event.httpMethod !== "GET") {
-    return json(405, {
-      error: "Methode nicht erlaubt"
-    });
-  }
 
   try {
+
     const orderId =
-      event.queryStringParameters?.orderId;
+      String(
+        event.queryStringParameters?.id ||
+        ""
+      ).trim();
+
 
     const trackingToken =
-      event.queryStringParameters?.token;
+      String(
+        event.queryStringParameters?.token ||
+        ""
+      ).trim();
 
-    if (!orderId || !trackingToken) {
-      return json(400, {
-        error: "Bestelldaten fehlen"
-      });
+
+    if (
+      !orderId ||
+      !trackingToken
+    ) {
+
+      return json(
+        400,
+        {
+          error:
+            "Bestelldaten fehlen."
+        }
+      );
+
     }
 
-    const orderRef = db
-      .collection("orders")
-      .doc(orderId);
 
     const orderSnap =
-      await orderRef.get();
+      await db
+        .collection("orders")
+        .doc(orderId)
+        .get();
 
-    if (!orderSnap.exists) {
-      return json(404, {
-        error: "Bestellung nicht gefunden"
-      });
+
+    if (
+      !orderSnap.exists
+    ) {
+
+      return json(
+        404,
+        {
+          error:
+            "Bestellung nicht gefunden."
+        }
+      );
+
     }
+
 
     const order =
       orderSnap.data();
 
-    const trackingHash = crypto
-      .createHash("sha256")
-      .update(
-        String(trackingToken)
-      )
-      .digest("hex");
+
+    const hash =
+      crypto
+        .createHash("sha256")
+        .update(
+          trackingToken
+        )
+        .digest("hex");
+
 
     if (
-      trackingHash !==
+      hash !==
       order.trackingTokenHash
     ) {
-      return json(403, {
-        error: "Ungültiger Zugriff"
-      });
+
+      return json(
+        403,
+        {
+          error:
+            "Ungültiger Zugriff."
+        }
+      );
+
     }
 
-    return json(200, {
-      orderId,
-      orderNumber:
-        order.orderNumber,
 
-      status:
-        order.status,
+    return json(
+      200,
+      {
 
-      deliveryMinutes:
-        order.deliveryMinutes || null,
+        orderNumber:
+          order.orderNumber,
 
-      grossTotal:
-        Number(
-          order.grossTotal || 0
-        ),
 
-      payableTotal:
-        Number(
-          order.payableTotal || 0
-        ),
+        status:
+          order.status,
 
-      freePizzaApplied:
-        Boolean(
-          order.freePizzaApplied
-        ),
 
-      freeCola:
-        Boolean(
-          order.freeCola
-        ),
+        deliveryMinutes:
+          order.deliveryMinutes ||
+          null,
 
-      paymentMethod:
-        order.paymentMethod,
 
-      paymentStatus:
-        order.paymentStatus || null
-    });
+        grossTotal:
+          Number(
+            order.grossTotal ||
+            0
+          ),
+
+
+        freePizzaApplied:
+          !!order.freePizzaApplied,
+
+
+        freePizzaDiscount:
+          Number(
+            order.freePizzaDiscount ||
+            0
+          ),
+
+
+        openingDiscountApplied:
+          !!order.openingDiscountApplied,
+
+
+        openingDiscountPercent:
+          Number(
+            order.openingDiscountPercent ||
+            0
+          ),
+
+
+        openingDiscount:
+          Number(
+            order.openingDiscount ||
+            0
+          ),
+
+
+        freeCola:
+          !!order.freeCola,
+
+
+        payableTotal:
+          Number(
+            order.payableTotal ||
+            0
+          ),
+
+
+        paymentMethod:
+          order.paymentMethod || null,
+
+
+        createdAtClient:
+          order.createdAtClient ||
+          null
+
+      }
+    );
+
 
   } catch (error) {
-    console.error(error);
 
-    return json(500, {
-      error:
-        error.message ||
-        "Bestellstatus konnte nicht geladen werden"
-    });
+    console.error(
+      error
+    );
+
+
+    return json(
+      500,
+      {
+        error:
+          error.message ||
+          "Status konnte nicht geladen werden."
+      }
+    );
+
   }
+
 };
