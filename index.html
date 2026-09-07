@@ -3,10 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Pizzeria TC Ehringshausen</title>
+<title>Pizzeria La Piazza Ehringshausen</title>
+
 <meta name="theme-color" content="#111111">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icon-192.png">
 
@@ -20,62 +22,143 @@
   --accent:#ffd166;
   --green:#42d77d;
   --red:#ff5c67;
-  --line:#303038
+  --line:#303038;
 }
-*{box-sizing:border-box}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  touch-action:manipulation;
+}
+
 body{
   margin:0;
   background:var(--bg);
   color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  touch-action:manipulation;
 }
-button,input,select,textarea{font:inherit}
-.wrap{max-width:940px;margin:auto;padding:16px 14px 105px}
-.top,.between,.row{display:flex;align-items:center;gap:10px}
-.top,.between{justify-content:space-between}
-.row{flex-wrap:wrap}
-h1{font-size:27px;margin:0 0 5px}
-h2{font-size:21px;margin:24px 0 10px}
-h3{margin:0 0 8px}
-.muted{color:var(--muted)}
+
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+button,
+.btn,
+[data-add],
+[data-qty]{
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.wrap{
+  max-width:940px;
+  margin:auto;
+  padding:16px 14px 105px;
+}
+
+.top,
+.between,
+.row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.top,
+.between{
+  justify-content:space-between;
+}
+
+.row{
+  flex-wrap:wrap;
+}
+
+h1{
+  font-size:27px;
+  margin:0 0 5px;
+}
+
+h2{
+  font-size:21px;
+  margin:24px 0 10px;
+}
+
+h3{
+  margin:0 0 8px;
+}
+
+.muted{
+  color:var(--muted);
+}
+
 .card{
   background:var(--card);
   border:1px solid var(--line);
   border-radius:16px;
   padding:14px;
-  margin-bottom:12px
+  margin-bottom:12px;
 }
+
 .grid{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px
+  gap:10px;
 }
+
 @media(max-width:650px){
-  .grid{grid-template-columns:1fr}
+  .grid{
+    grid-template-columns:1fr;
+  }
 }
+
 .product{
   display:flex;
   justify-content:space-between;
   gap:12px;
-  align-items:center
+  align-items:center;
 }
-.price{font-weight:900;margin-top:5px}
+
+.price{
+  font-weight:900;
+  margin-top:5px;
+}
+
 .btn{
   border:0;
   border-radius:12px;
   padding:11px 14px;
   font-weight:850;
   background:var(--accent);
-  color:#111
+  color:#111;
 }
+
 .btn.secondary{
   background:var(--soft);
   color:var(--text);
-  border:1px solid var(--line)
+  border:1px solid var(--line);
 }
-.btn.green{background:var(--green);color:#07170d}
-.btn.red{background:var(--red);color:#fff}
-.btn.small{padding:8px 10px;font-size:14px}
+
+.btn.green{
+  background:var(--green);
+  color:#07170d;
+}
+
+.btn.red{
+  background:var(--red);
+  color:#fff;
+}
+
+.btn.small{
+  padding:8px 10px;
+  font-size:14px;
+}
+
 .status{
   display:inline-flex;
   align-items:center;
@@ -83,52 +166,87 @@ h3{margin:0 0 8px}
   border-radius:999px;
   padding:8px 11px;
   font-weight:850;
-  background:var(--soft)
+  background:var(--soft);
 }
-.dot{width:10px;height:10px;border-radius:50%}
-.open{color:var(--green)}
-.closed{color:var(--red)}
-.open .dot{background:var(--green)}
-.closed .dot{background:var(--red)}
+
+.dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+}
+
+.open{
+  color:var(--green);
+}
+
+.closed{
+  color:var(--red);
+}
+
+.open .dot{
+  background:var(--green);
+}
+
+.closed .dot{
+  background:var(--red);
+}
+
 .notice{
   border-left:4px solid var(--accent);
   padding:11px 12px;
   background:#1c1a13;
   border-radius:10px;
-  margin-bottom:12px
+  margin-bottom:12px;
 }
+
 .notice.red{
   border-left-color:var(--red);
-  background:#241216
+  background:#241216;
 }
+
 .notice.green{
   border-left-color:var(--green);
-  background:#102017
+  background:#102017;
 }
-.hidden{display:none!important}
-input,select,textarea{
+
+.hidden{
+  display:none!important;
+}
+
+input,
+select,
+textarea{
   width:100%;
   background:#101014;
   color:var(--text);
   border:1px solid var(--line);
   border-radius:11px;
-  padding:12px
+  padding:12px;
 }
-textarea{min-height:80px}
+
+textarea{
+  min-height:80px;
+}
+
 label{
   display:block;
   font-size:14px;
   font-weight:800;
-  margin:10px 0 5px
+  margin:10px 0 5px;
 }
+
 .two{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:10px
+  gap:10px;
 }
+
 @media(max-width:560px){
-  .two{grid-template-columns:1fr}
+  .two{
+    grid-template-columns:1fr;
+  }
 }
+
 .cartbar{
   position:fixed;
   left:0;
@@ -137,16 +255,18 @@ label{
   background:#0d0d0ff5;
   border-top:1px solid var(--line);
   padding:10px 14px;
-  z-index:20
+  z-index:20;
 }
+
 .cartbar-inner{
   max-width:940px;
   margin:auto;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  gap:12px
+  gap:12px;
 }
+
 .badge{
   display:inline-block;
   padding:3px 7px;
@@ -154,26 +274,38 @@ label{
   background:var(--accent);
   color:#111;
   font-weight:900;
-  font-size:12px
+  font-size:12px;
 }
+
 dialog{
   border:1px solid var(--line);
   border-radius:18px;
   background:var(--card);
   color:var(--text);
   width:min(94vw,650px);
-  padding:0
+  padding:0;
 }
-dialog::backdrop{background:#000c}
-.dialog-body{padding:16px}
+
+dialog::backdrop{
+  background:#000c;
+}
+
+.dialog-body{
+  padding:16px;
+}
+
 .extra-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:8px
+  gap:8px;
 }
+
 @media(max-width:520px){
-  .extra-grid{grid-template-columns:1fr}
+  .extra-grid{
+    grid-template-columns:1fr;
+  }
 }
+
 .extra{
   display:flex;
   align-items:center;
@@ -181,26 +313,113 @@ dialog::backdrop{background:#000c}
   background:#111115;
   border:1px solid var(--line);
   border-radius:10px;
-  padding:10px
+  padding:10px;
 }
-.extra input{width:auto}
-.cart-item,.admin-order{
+
+.extra input{
+  width:auto;
+}
+
+.cart-item,
+.admin-order{
   padding:11px 0;
-  border-bottom:1px solid var(--line)
+  border-bottom:1px solid var(--line);
 }
+
 .admin-order{
   background:#111115;
   border:1px solid var(--line);
   border-radius:14px;
   padding:13px;
-  margin:10px 0
+  margin:10px 0;
 }
-.free{color:var(--green);font-weight:900}
-a{color:var(--accent)}
+
+.free{
+  color:var(--green);
+  font-weight:900;
+}
+
+a{
+  color:var(--accent);
+}
+
 hr{
   border:0;
   border-top:1px solid var(--line);
-  margin:15px 0
+  margin:15px 0;
+}
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:92px;
+  transform:translate(-50%,18px);
+  opacity:0;
+  pointer-events:none;
+  background:#202027;
+  color:#fff;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:11px 16px;
+  font-weight:850;
+  z-index:60;
+  transition:.2s;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+.cartbar.pop{
+  animation:cartpop .28s ease;
+}
+
+@keyframes cartpop{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.035)}
+  100%{transform:scale(1)}
+}
+
+.admin-tabs{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+
+.admin-tab.active{
+  background:var(--accent);
+  color:#111;
+}
+
+.qtybox{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:#101014;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:4px;
+}
+
+.qtynum{
+  min-width:24px;
+  text-align:center;
+  font-weight:900;
+}
+
+.order-detail{
+  background:#101014;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px;
+  margin-top:8px;
+}
+
+.promo{
+  border-left-color:#ff9f1c;
+  background:#251b0c;
 }
 </style>
 </head>
@@ -212,8 +431,10 @@ hr{
 <section id="customerView">
 
 <div class="top">
+
   <div>
-    <h1>🍕 Pizzeria TC Ehringshausen</h1>
+    <h1>🍕 Pizzeria La Piazza</h1>
+
     <div class="muted">
       TC Heinrichsegen Ehringshausen · 35630 Ehringshausen
     </div>
@@ -223,19 +444,29 @@ hr{
     <span class="dot"></span>
     <span>Geschlossen</span>
   </div>
+
 </div>
 
 <div id="capacityNotice" class="notice hidden"></div>
 
 <div class="card between">
+
   <div>
     <strong>Lieferbestellung</strong>
-    <div class="muted">Mindestbestellwert 25,00 €</div>
+    <div class="muted">
+      Mindestbestellwert 25,00 €
+    </div>
   </div>
 
   <a href="tel:+4917617818738">
     0176 17818738
   </a>
+
+</div>
+
+<div id="openingPromo" class="notice promo hidden">
+  <strong>🎉 Eröffnungstag – 20 % Rabatt</strong><br>
+  Nur am 14.10.2026 automatisch auf deine Bestellung.
 </div>
 
 <div class="card">
@@ -243,11 +474,15 @@ hr{
   <div class="between">
 
     <div>
-      <strong>🎁 Treuekonto</strong>
+
+      <strong>
+        🎁 Treuekonto
+      </strong>
 
       <div id="loyaltySummary" class="muted">
         Jede 10. abgeschlossene Bestellung = 1 Gratis-Pizza.
       </div>
+
     </div>
 
     <button class="btn secondary small" id="loginBtn">
@@ -268,23 +503,52 @@ hr{
 
 </div>
 
+<div id="lastOrderCard" class="card hidden">
+
+  <div class="between">
+
+    <div>
+      <strong>Letzte Bestellung</strong>
+      <div id="lastOrderText" class="muted"></div>
+    </div>
+
+    <button class="btn secondary small" id="refreshOrderStatus">
+      Status
+    </button>
+
+  </div>
+
+  <div id="lastOrderActions" style="margin-top:8px"></div>
+
+</div>
+
 <div class="notice">
-  <strong>Allergene & Zusatzstoffe:</strong>
+
+  <strong>
+    Allergene & Zusatzstoffe:
+  </strong>
+
   Informationen erhalten Sie auf telefonische Nachfrage unter
+
   <a href="tel:+4917617818738">
     0176 17818738
   </a>.
+
 </div>
 
 <div id="menu"></div>
 
 <div class="card">
 
-  <strong>Öffnungszeiten</strong>
+  <strong>
+    Öffnungszeiten
+  </strong>
 
   <div class="muted" style="margin-top:6px">
-    Mo–Mi 14:00–19:00 · Do geschlossen ·
-    Fr 14:00–19:00 · Sa 16:00–22:00 ·
+    Mo–Mi 14:00–19:00 ·
+    Do geschlossen ·
+    Fr 14:00–19:00 ·
+    Sa 16:00–22:00 ·
     So 16:00–20:00
   </div>
 
@@ -298,7 +562,8 @@ hr{
 <div class="top">
 
   <div>
-    <h1>Admin · Pizzeria TC</h1>
+    <h1>Admin · Pizzeria La Piazza</h1>
+
     <div class="muted">
       Bestellungen & Auslastung
     </div>
@@ -313,12 +578,20 @@ hr{
 
 <div id="adminLogin" class="card">
 
-  <h3>Admin-Anmeldung</h3>
+  <h3>
+    Admin-Anmeldung
+  </h3>
 
-  <label>E-Mail</label>
+  <label>
+    E-Mail
+  </label>
+
   <input id="adminEmail" type="email">
 
-  <label>Passwort</label>
+  <label>
+    Passwort
+  </label>
+
   <input id="adminPassword" type="password">
 
   <button class="btn" id="adminLoginBtn" style="margin-top:12px">
@@ -332,7 +605,9 @@ hr{
 
 <div class="card">
 
-  <h3>Öffnungsstatus</h3>
+  <h3>
+    Öffnungsstatus
+  </h3>
 
   <div class="row">
 
@@ -357,7 +632,9 @@ hr{
 
 <div class="card">
 
-  <h3>Bestellaufkommen</h3>
+  <h3>
+    Bestellaufkommen
+  </h3>
 
   <div class="row">
 
@@ -391,10 +668,15 @@ hr{
 <div class="card between">
 
   <div>
-    <strong>Push-Benachrichtigungen</strong>
+
+    <strong>
+      Push-Benachrichtigungen
+    </strong>
+
     <div class="muted">
       Neue Bestellung aufs Handy
     </div>
+
   </div>
 
   <button class="btn small" id="enableAdminPush">
@@ -403,13 +685,37 @@ hr{
 
 </div>
 
+
+<div class="admin-tabs">
+
+  <button
+    class="btn secondary small admin-tab active"
+    data-admin-tab="live"
+  >
+    Aktuelle Bestellungen
+  </button>
+
+  <button
+    class="btn secondary small admin-tab"
+    data-admin-tab="overview"
+  >
+    Bestellübersicht
+  </button>
+
+</div>
+
 <div id="orders"></div>
+
+<div id="orderOverview" class="hidden"></div>
 
 </div>
 
 </section>
 
 </div>
+
+
+<div id="toast" class="toast"></div>
 
 
 <div class="cartbar" id="cartBar">
@@ -420,7 +726,9 @@ hr{
 
     <strong>
       Warenkorb
-      <span class="badge" id="cartCount">0</span>
+      <span class="badge" id="cartCount">
+        0
+      </span>
     </strong>
 
     <div class="muted" id="cartTotal">
@@ -448,14 +756,18 @@ hr{
     Pizza
   </h3>
 
-  <button class="btn secondary small" onclick="pizzaDialog.close()">
+  <button
+    class="btn secondary small"
+    onclick="pizzaDialog.close()"
+  >
     Schließen
   </button>
 
 </div>
 
 <div class="muted">
-  30 cm · 1. Extra kostenlos, jedes weitere Extra +1,00 €
+  30 cm · 1 Gemüse-Extra kostenlos.
+  Käse, Fleisch/Wurst und Thunfisch immer +1,00 €
 </div>
 
 <div class="extra-grid" id="extras" style="margin-top:12px"></div>
@@ -475,9 +787,14 @@ hr{
 
 <div class="between">
 
-  <h3>Warenkorb</h3>
+  <h3>
+    Warenkorb
+  </h3>
 
-  <button class="btn secondary small" onclick="cartDialog.close()">
+  <button
+    class="btn secondary small"
+    onclick="cartDialog.close()"
+  >
     Schließen
   </button>
 
@@ -489,30 +806,27 @@ hr{
 
 <div class="between">
   <span>Warenwert</span>
-  <strong id="grossText">
-    0,00 €
-  </strong>
+  <strong id="grossText">0,00 €</strong>
 </div>
 
 <div class="between hidden" id="freePizzaRow">
   <span>Gratis-Pizza</span>
-  <strong class="free" id="freePizzaText">
-    −0,00 €
-  </strong>
+  <strong class="free" id="freePizzaText">−0,00 €</strong>
+</div>
+
+<div class="between hidden" id="openingDiscountRow">
+  <span>Eröffnungsrabatt −20 %</span>
+  <strong class="free" id="openingDiscountText">−0,00 €</strong>
 </div>
 
 <div class="between hidden" id="freeColaRow">
   <span>🎁 Coca-Cola 1 L</span>
-  <strong class="free">
-    GRATIS
-  </strong>
+  <strong class="free">GRATIS</strong>
 </div>
 
 <div class="between" style="margin-top:6px">
   <strong>Zu zahlen</strong>
-  <strong id="payText">
-    0,00 €
-  </strong>
+  <strong id="payText">0,00 €</strong>
 </div>
 
 <button class="btn" id="checkoutBtn" style="width:100%;margin-top:12px">
@@ -530,9 +844,14 @@ hr{
 
 <div class="between">
 
-  <h3>Bestellung abschließen</h3>
+  <h3>
+    Bestellung abschließen
+  </h3>
 
-  <button class="btn secondary small" onclick="checkoutDialog.close()">
+  <button
+    class="btn secondary small"
+    onclick="checkoutDialog.close()"
+  >
     Schließen
   </button>
 
@@ -554,7 +873,6 @@ hr{
 
 </div>
 
-
 <div class="two">
 
   <div>
@@ -568,7 +886,6 @@ hr{
   </div>
 
 </div>
-
 
 <div class="two">
 
@@ -584,8 +901,9 @@ hr{
 
 </div>
 
-
-<label>Zahlungsart</label>
+<label>
+  Zahlungsart
+</label>
 
 <select id="payment">
 
@@ -599,14 +917,13 @@ hr{
 
 </select>
 
-
-<label>Hinweis</label>
+<label>
+  Hinweis
+</label>
 
 <textarea id="note" placeholder="Optional"></textarea>
 
-
 <div class="notice" id="checkoutInfo" style="margin-top:12px"></div>
-
 
 <button class="btn" type="submit" style="width:100%">
   Bestellung absenden
@@ -625,18 +942,24 @@ hr{
 
 <div class="between">
 
-  <h3>Telefonnummer bestätigen</h3>
+  <h3>
+    Telefonnummer bestätigen
+  </h3>
 
-  <button class="btn secondary small" onclick="phoneDialog.close()">
+  <button
+    class="btn secondary small"
+    onclick="phoneDialog.close()"
+  >
     Schließen
   </button>
 
 </div>
 
-
 <div id="phoneStep">
 
-  <label>Telefonnummer</label>
+  <label>
+    Telefonnummer
+  </label>
 
   <input
     id="loginPhone"
@@ -652,10 +975,11 @@ hr{
 
 </div>
 
-
 <div id="codeStep" class="hidden">
 
-  <label>SMS-Code</label>
+  <label>
+    SMS-Code
+  </label>
 
   <input id="smsCode" inputmode="numeric">
 
@@ -673,11 +997,8 @@ hr{
 
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-
 
 <script>
 
@@ -696,59 +1017,231 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 const ADMIN_EMAIL = "tahayman10@gmail.com";
+
 const MIN_ORDER = 25;
+
 const FREE_COLA_AT = 55;
+
+const OPENING_DAY = "2026-10-14";
 
 
 const MENU = [
 
-  ["p1","Pizza","Margherita","Tomatensoße, Käse",10,false],
+  [
+    "p1",
+    "Pizza",
+    "Margherita",
+    "Tomatensoße, Käse",
+    10,
+    false
+  ],
 
-  ["p2","Pizza","Schinken Pilze","Schinken, Champignons",11.5,false],
+  [
+    "p2",
+    "Pizza",
+    "Schinken Pilze",
+    "Schinken, Champignons",
+    11.5,
+    false
+  ],
 
-  ["p3","Pizza","Rucola","Rucola, Parmaschinken",13,false],
+  [
+    "p3",
+    "Pizza",
+    "Rucola",
+    "Rucola, Parmaschinken",
+    13,
+    false
+  ],
 
-  ["p4","Pizza","Salami","Salami",11,false],
+  [
+    "p4",
+    "Pizza",
+    "Salami",
+    "Salami",
+    11,
+    false
+  ],
 
-  ["p5","Pizza","Peperoni","Peperonisalami",11.5,false],
+  [
+    "p5",
+    "Pizza",
+    "Peperoni",
+    "Peperonisalami",
+    11.5,
+    false
+  ],
 
-  ["p6","Pizza","Tonno","Thunfisch, Zwiebeln",12,false],
+  [
+    "p6",
+    "Pizza",
+    "Tonno",
+    "Thunfisch, Zwiebeln",
+    12,
+    false
+  ],
 
-  ["p7","Pizza","Sucuk","Sucuk",11.5,false],
+  [
+    "p7",
+    "Pizza",
+    "Sucuk",
+    "Sucuk",
+    11.5,
+    false
+  ],
 
-  ["p8","Pizza","Mix","Salami, Schinken, Pilze",13,false],
+  [
+    "p8",
+    "Pizza",
+    "Mix",
+    "Salami, Schinken, Pilze",
+    13,
+    false
+  ],
 
-  ["p9","Pizza","4 Käse","Vier verschiedene Käsesorten",13,false],
+  [
+    "p9",
+    "Pizza",
+    "4 Käse",
+    "Vier verschiedene Käsesorten",
+    13,
+    false
+  ],
 
-  ["p10","Pizza","Vegetarisch","Verschiedenes Gemüse",12.5,false],
+  [
+    "p10",
+    "Pizza",
+    "Vegetarisch",
+    "Verschiedenes Gemüse",
+    12.5,
+    false
+  ],
 
-  ["p11","Pizza","Halal","Mit Halal Salami",11.5,false],
+  [
+    "p11",
+    "Pizza",
+    "Halal",
+    "Mit Halal Salami",
+    11.5,
+    false
+  ],
 
-  ["b1","Beilagen","Pommes","Portion Pommes",3.5,false],
+  [
+    "b1",
+    "Beilagen",
+    "Pommes",
+    "Portion Pommes",
+    3.5,
+    false
+  ],
 
-  ["b2","Beilagen","Chicken Nuggets","6 Stück",4.2,false],
+  [
+    "b2",
+    "Beilagen",
+    "Chicken Nuggets",
+    "6 Stück",
+    4.2,
+    false
+  ],
 
-  ["d1","Softdrinks","Coca-Cola","1 L",4.1,false],
+  [
+    "d1",
+    "Softdrinks",
+    "Coca-Cola",
+    "1 L",
+    4.1,
+    false
+  ],
 
-  ["d2","Softdrinks","Sprite","1 L",4.1,false],
+  [
+    "d2",
+    "Softdrinks",
+    "Sprite",
+    "1 L",
+    4.1,
+    false
+  ],
 
-  ["d3","Softdrinks","Fanta","1 L",4.1,false],
+  [
+    "d3",
+    "Softdrinks",
+    "Fanta",
+    "1 L",
+    4.1,
+    false
+  ],
 
-  ["d4","Softdrinks","Cola Zero","1 L",4.1,false],
+  [
+    "d4",
+    "Softdrinks",
+    "Cola Zero",
+    "1 L",
+    4.1,
+    false
+  ],
 
-  ["w1","Weinflaschen","Weißer Burgunder","Flasche",19,true],
+  [
+    "w1",
+    "Weinflaschen",
+    "Weißer Burgunder",
+    "Flasche",
+    19,
+    true
+  ],
 
-  ["w2","Weinflaschen","Grauburgunder","Flasche",19,true],
+  [
+    "w2",
+    "Weinflaschen",
+    "Grauburgunder",
+    "Flasche",
+    19,
+    true
+  ],
 
-  ["a1","Biere","Weizen","0,5 L",3.6,true],
+  [
+    "a1",
+    "Biere",
+    "Weizen",
+    "0,5 L",
+    3.6,
+    true
+  ],
 
-  ["a2","Biere","Weizen 0,0 %","0,5 L",3.6,false],
+  [
+    "a2",
+    "Biere",
+    "Weizen 0,0 %",
+    "0,5 L",
+    3.6,
+    false
+  ],
 
-  ["a3","Biere","Corona","0,33 L",3.6,true],
+  [
+    "a3",
+    "Biere",
+    "Corona",
+    "0,33 L",
+    3.6,
+    true
+  ],
 
-  ["a4","Biere","Pils","0,33 L",3.1,true],
+  [
+    "a4",
+    "Biere",
+    "Pils",
+    "0,33 L",
+    3.1,
+    true
+  ],
 
-  ["a5","Biere","Pils 0,0 %","0,33 L",3.1,false]
+  [
+    "a5",
+    "Biere",
+    "Pils 0,0 %",
+    "0,33 L",
+    3.1,
+    false
+  ]
 
 ];
 
@@ -776,6 +1269,19 @@ const EXTRAS = [
 ];
 
 
+const FREE_EXTRAS = new Set([
+
+  "Champignons",
+  "Brokkoli",
+  "Aubergine",
+  "Paprika",
+  "Rucola",
+  "Oliven",
+  "Zwiebeln"
+
+]);
+
+
 let cart = [];
 
 let selectedPizza = null;
@@ -783,15 +1289,15 @@ let selectedPizza = null;
 let currentUser = null;
 
 let loyalty = {
-  completedOrders: 0,
-  freePizzaCredits: 0
+  completedOrders:0,
+  freePizzaCredits:0
 };
 
 let useFreePizza = false;
 
 let settings = {
-  manualStatus: "auto",
-  capacity: "normal"
+  manualStatus:"auto",
+  capacity:"normal"
 };
 
 let confirmationResult = null;
@@ -805,39 +1311,128 @@ const money = n =>
   new Intl.NumberFormat(
     "de-DE",
     {
-      style: "currency",
-      currency: "EUR"
+      style:"currency",
+      currency:"EUR"
     }
   ).format(n);
 
 
 const menuItem = id =>
-  MENU.find(x => x[0] === id);
+  MENU.find(
+    x => x[0] === id
+  );
 
 
 const isPizza = x =>
   x.category === "Pizza";
 
 
-function normalizePhone(v) {
+function todayString(){
+
+  const d =
+    new Date();
+
+  const year =
+    d.getFullYear();
+
+  const month =
+    String(
+      d.getMonth() + 1
+    ).padStart(2,"0");
+
+  const day =
+    String(
+      d.getDate()
+    ).padStart(2,"0");
+
+  return `${year}-${month}-${day}`;
+}
+
+
+function openingDiscountActive(){
+
+  return todayString() ===
+    OPENING_DAY;
+}
+
+
+function showToast(message){
+
+  const toast =
+    $("toast");
+
+  toast.textContent =
+    message;
+
+  toast.classList.add(
+    "show"
+  );
+
+  $("cartBar")
+    .classList
+    .remove("pop");
+
+  void $("cartBar")
+    .offsetWidth;
+
+  $("cartBar")
+    .classList
+    .add("pop");
+
+  if(
+    navigator.vibrate
+  ){
+
+    try{
+      navigator.vibrate(45);
+    }catch(e){}
+
+  }
+
+  setTimeout(
+    () =>
+      toast
+        .classList
+        .remove("show"),
+    1600
+  );
+}
+
+
+function normalizePhone(v){
 
   let p =
     (v || "")
-      .replace(/[^\d+]/g, "");
+      .replace(
+        /[^\d+]/g,
+        ""
+      );
 
-  if (p.startsWith("00")) {
-    p = "+" + p.slice(2);
+  if(
+    p.startsWith("00")
+  ){
+
+    p =
+      "+" +
+      p.slice(2);
+
   }
 
-  if (p.startsWith("0")) {
-    p = "+49" + p.slice(1);
+  if(
+    p.startsWith("0")
+  ){
+
+    p =
+      "+49" +
+      p.slice(1);
+
   }
 
   return p;
 }
 
 
-function scheduledOpen() {
+function scheduledOpen(){
 
   const n =
     new Date();
@@ -850,13 +1445,15 @@ function scheduledOpen() {
     n.getMinutes();
 
   const r = {
-    0: [960,1200],
-    1: [840,1140],
-    2: [840,1140],
-    3: [840,1140],
-    4: null,
-    5: [840,1140],
-    6: [960,1320]
+
+    0:[960,1200],
+    1:[840,1140],
+    2:[840,1140],
+    3:[840,1140],
+    4:null,
+    5:[840,1140],
+    6:[960,1320]
+
   }[d];
 
   return !!r &&
@@ -865,13 +1462,19 @@ function scheduledOpen() {
 }
 
 
-function isOpen() {
+function isOpen(){
 
-  if (settings.manualStatus === "open") {
+  if(
+    settings.manualStatus ===
+    "open"
+  ){
     return true;
   }
 
-  if (settings.manualStatus === "closed") {
+  if(
+    settings.manualStatus ===
+    "closed"
+  ){
     return false;
   }
 
@@ -879,7 +1482,7 @@ function isOpen() {
 }
 
 
-function renderStatus() {
+function renderStatus(){
 
   const o =
     isOpen();
@@ -889,21 +1492,35 @@ function renderStatus() {
 
   b.className =
     "status " +
-    (o ? "open" : "closed");
+    (
+      o
+        ? "open"
+        : "closed"
+    );
 
   b.innerHTML =
-    `<span class="dot"></span>
-     <span>${o ? "Geöffnet" : "Geschlossen"}</span>`;
+    `
+      <span class="dot"></span>
+      <span>
+        ${o ? "Geöffnet" : "Geschlossen"}
+      </span>
+    `;
 
 
-  if ($("adminOpenText")) {
+  if(
+    $("adminOpenText")
+  ){
 
-    $("adminOpenText").textContent =
-      settings.manualStatus === "auto"
+    $("adminOpenText")
+      .textContent =
+      settings.manualStatus ===
+      "auto"
         ? "Automatisch nach Öffnungszeiten"
-        : settings.manualStatus === "open"
+        : settings.manualStatus ===
+          "open"
         ? "Manuell geöffnet"
         : "Manuell geschlossen";
+
   }
 
 
@@ -911,14 +1528,18 @@ function renderStatus() {
     settings.capacity;
 
 
-  if ($("adminCapacityText")) {
+  if(
+    $("adminCapacityText")
+  ){
 
-    $("adminCapacityText").textContent =
+    $("adminCapacityText")
+      .textContent =
       c === "normal"
         ? "Normales Bestellaufkommen"
         : c === "stop"
         ? "Bestellstopp aktiv"
         : `Aktuelle Richtzeit: ca. ${c} Minuten`;
+
   }
 
 
@@ -926,13 +1547,21 @@ function renderStatus() {
     $("capacityNotice");
 
 
-  if (c === "normal") {
+  if(
+    c === "normal"
+  ){
 
-    n.classList.add("hidden");
+    n.classList.add(
+      "hidden"
+    );
 
-  } else if (c === "stop") {
+  }else if(
+    c === "stop"
+  ){
 
-    n.classList.remove("hidden");
+    n.classList.remove(
+      "hidden"
+    );
 
     n.className =
       "notice red";
@@ -940,227 +1569,288 @@ function renderStatus() {
     n.innerHTML =
       "<strong>Hohes Bestellaufkommen:</strong> Vorübergehend können keine neuen Bestellungen angenommen werden.";
 
-  } else {
+  }else{
 
-    n.classList.remove("hidden");
+    n.classList.remove(
+      "hidden"
+    );
 
     n.className =
       "notice";
 
     n.innerHTML =
-      `<strong>Hohes Bestellaufkommen:</strong>
-       Aktuelle Lieferzeit ca.
-       <strong>${c} Minuten</strong>.`;
+      `
+        <strong>
+          Hohes Bestellaufkommen:
+        </strong>
+
+        Aktuelle Lieferzeit ca.
+
+        <strong>
+          ${c} Minuten
+        </strong>.
+      `;
+
   }
+
+
+  $("openingPromo")
+    .classList
+    .toggle(
+      "hidden",
+      !openingDiscountActive()
+    );
+
 }
 
 
 db
   .collection("settings")
   .doc("public")
-  .onSnapshot(s => {
+  .onSnapshot(
+    s => {
 
-    if (s.exists) {
+      if(
+        s.exists
+      ){
 
-      settings = {
-        ...settings,
-        ...s.data()
-      };
+        settings = {
+          ...settings,
+          ...s.data()
+        };
+
+      }
+
+      renderStatus();
 
     }
-
-    renderStatus();
-
-  });
+  );
 
 
-function renderMenu() {
+function renderMenu(){
 
   const root =
     $("menu");
 
-  root.innerHTML = "";
+  root.innerHTML =
+    "";
 
 
   [
     ...new Set(
-      MENU.map(x => x[1])
+      MENU.map(
+        x => x[1]
+      )
     )
-  ].forEach(cat => {
+  ]
+  .forEach(
+    cat => {
 
-    const h =
-      document.createElement("h2");
+      const h =
+        document.createElement(
+          "h2"
+        );
 
-    h.textContent =
-      cat +
-      (
-        cat === "Pizza"
-          ? " · 30 cm"
-          : ""
+      h.textContent =
+        cat +
+        (
+          cat === "Pizza"
+            ? " · 30 cm"
+            : ""
+        );
+
+      root.appendChild(
+        h
       );
 
-    root.appendChild(h);
+
+      const g =
+        document.createElement(
+          "div"
+        );
+
+      g.className =
+        "grid";
 
 
-    const g =
-      document.createElement("div");
+      MENU
+        .filter(
+          x =>
+            x[1] === cat
+        )
+        .forEach(
+          x => {
 
-    g.className =
-      "grid";
+            const d =
+              document.createElement(
+                "div"
+              );
 
-
-    MENU
-      .filter(x => x[1] === cat)
-      .forEach(x => {
-
-        const d =
-          document.createElement("div");
-
-        d.className =
-          "card product";
-
-
-        d.innerHTML = `
-
-          <div>
-
-            <strong>
-              ${x[2]}
-            </strong>
-
-            <div class="muted">
-
-              ${x[3]}
-
-              ${
-                cat === "Pizza"
-                  ? " · 30 cm"
-                  : ""
-              }
-
-              ${
-                x[5]
-                  ? " · Alkohol"
-                  : ""
-              }
-
-            </div>
-
-            <div class="price">
-              ${money(x[4])}
-            </div>
-
-          </div>
+            d.className =
+              "card product";
 
 
-          <button
-            class="btn small"
-            data-add="${x[0]}"
-          >
+            d.innerHTML =
+              `
 
-            ${
-              cat === "Pizza"
-                ? "Auswählen"
-                : "+"
-            }
+                <div>
 
-          </button>
+                  <strong>
+                    ${x[2]}
+                  </strong>
 
-        `;
+                  <div class="muted">
+
+                    ${x[3]}
+
+                    ${
+                      cat === "Pizza"
+                        ? " · 30 cm"
+                        : ""
+                    }
+
+                    ${
+                      x[5]
+                        ? " · Alkohol"
+                        : ""
+                    }
+
+                  </div>
+
+                  <div class="price">
+                    ${money(x[4])}
+                  </div>
+
+                </div>
 
 
-        g.appendChild(d);
+                <button
+                  class="btn small"
+                  data-add="${x[0]}"
+                >
 
-      });
+                  ${
+                    cat === "Pizza"
+                      ? "Auswählen"
+                      : "+"
+                  }
+
+                </button>
+
+              `;
 
 
-    root.appendChild(g);
+            g.appendChild(
+              d
+            );
 
-  });
+          }
+        );
+
+
+      root.appendChild(
+        g
+      );
+
+    }
+  );
 
 
   root
-    .querySelectorAll("[data-add]")
-    .forEach(b => {
+    .querySelectorAll(
+      "[data-add]"
+    )
+    .forEach(
+      b => {
 
-      b.onclick = () => {
+        b.onclick =
+          () => {
 
-        const x =
-          menuItem(
-            b.dataset.add
-          );
-
-
-        if (x[1] === "Pizza") {
-
-          openPizza(x);
-
-        } else {
-
-          cart.push({
-
-            lineId:
-              crypto.randomUUID(),
-
-            id:
-              x[0],
-
-            category:
-              x[1],
-
-            name:
-              x[2],
-
-            basePrice:
-              x[4],
-
-            extras: [],
-
-            extraCost: 0,
-
-            alcohol:
-              x[5]
-
-          });
+            const x =
+              menuItem(
+                b.dataset.add
+              );
 
 
-          refreshCart();
+            if(
+              x[1] === "Pizza"
+            ){
 
-        }
+              openPizza(x);
 
-      };
+            }else{
 
-    });
+              addOrIncreaseItem({
+                id:x[0],
+                category:x[1],
+                name:x[2],
+                basePrice:x[4],
+                extras:[],
+                extraCost:0,
+                alcohol:x[5]
+              });
+
+              showToast(
+                `${x[2]} hinzugefügt`
+              );
+
+            }
+
+          };
+
+      }
+    );
 
 }
 
 
-function openPizza(x) {
+function openPizza(x){
 
   selectedPizza =
     x;
 
-  $("pizzaTitle").textContent =
+  $("pizzaTitle")
+    .textContent =
     `${x[2]} · 30 cm`;
 
 
-  $("extras").innerHTML =
+  $("extras")
+    .innerHTML =
     EXTRAS
       .map(
-        e => `
-          <label class="extra">
+        e => {
 
-            <input
-              type="checkbox"
-              value="${e}"
-            >
+          const free =
+            FREE_EXTRAS.has(e);
 
-            <span>
-              ${e}
-            </span>
+          return `
 
-          </label>
-        `
+            <label class="extra">
+
+              <input
+                type="checkbox"
+                value="${e}"
+              >
+
+              <span>
+
+                ${e}
+
+                <span class="muted">
+                  ${
+                    free
+                      ? " · ggf. 1. Gemüse-Extra gratis"
+                      : " · +1,00 €"
+                  }
+                </span>
+
+              </span>
+
+            </label>
+
+          `;
+
+        }
       )
       .join("");
 
@@ -1171,95 +1861,184 @@ function openPizza(x) {
 }
 
 
-$("addPizza").onclick = () => {
+function calculateExtraCost(
+  extras
+){
 
-  const ex =
-    [
-      ...$("extras")
-        .querySelectorAll(
-          "input:checked"
+  let freeUsed =
+    false;
+
+  let cost =
+    0;
+
+
+  extras.forEach(
+    extra => {
+
+      if(
+        FREE_EXTRAS.has(extra) &&
+        !freeUsed
+      ){
+
+        freeUsed =
+          true;
+
+      }else{
+
+        cost +=
+          1;
+
+      }
+
+    }
+  );
+
+
+  return cost;
+}
+
+
+function addOrIncreaseItem(item){
+
+  const existing =
+    cart.find(
+      x =>
+        x.id === item.id &&
+        JSON.stringify(
+          [...x.extras].sort()
+        ) ===
+        JSON.stringify(
+          [...item.extras].sort()
         )
-    ]
+    );
+
+
+  if(
+    existing
+  ){
+
+    existing.qty +=
+      1;
+
+  }else{
+
+    cart.push({
+      lineId:
+        crypto.randomUUID(),
+      qty:1,
+      ...item
+    });
+
+  }
+
+
+  refreshCart();
+}
+
+
+$("addPizza")
+  .onclick =
+  () => {
+
+    const ex =
+      [
+        ...$("extras")
+          .querySelectorAll(
+            "input:checked"
+          )
+      ]
       .map(
         x => x.value
       );
 
 
-  const cost =
-    Math.max(
-      0,
-      ex.length - 1
+    const cost =
+      calculateExtraCost(
+        ex
+      );
+
+
+    addOrIncreaseItem({
+
+      id:
+        selectedPizza[0],
+
+      category:
+        "Pizza",
+
+      name:
+        selectedPizza[2],
+
+      basePrice:
+        selectedPizza[4],
+
+      extras:
+        ex,
+
+      extraCost:
+        cost,
+
+      alcohol:
+        false
+
+    });
+
+
+    $("pizzaDialog")
+      .close();
+
+
+    showToast(
+      `${selectedPizza[2]} hinzugefügt`
     );
-
-
-  cart.push({
-
-    lineId:
-      crypto.randomUUID(),
-
-    id:
-      selectedPizza[0],
-
-    category:
-      "Pizza",
-
-    name:
-      selectedPizza[2],
-
-    basePrice:
-      selectedPizza[4],
-
-    extras:
-      ex,
-
-    extraCost:
-      cost,
-
-    alcohol:
-      false
-
-  });
-
-
-  $("pizzaDialog")
-    .close();
-
-
-  refreshCart();
 
 };
 
 
-function gross() {
+function lineTotal(x){
+
+  return (
+    x.basePrice +
+    x.extraCost
+  ) *
+  (
+    x.qty || 1
+  );
+
+}
+
+
+function gross(){
 
   return cart.reduce(
     (s,x) =>
       s +
-      x.basePrice +
-      x.extraCost,
+      lineTotal(x),
     0
   );
 
 }
 
 
-function freePizzaLine() {
+function freePizzaLine(){
 
-  if (
+  if(
     !useFreePizza ||
     loyalty.freePizzaCredits < 1
-  ) {
+  ){
+
     return null;
+
   }
 
 
-  return cart.find(isPizza)
-    || null;
-
+  return cart.find(
+    isPizza
+  ) || null;
 }
 
 
-function discount() {
+function discount(){
 
   const x =
     freePizzaLine();
@@ -1269,11 +2048,10 @@ function discount() {
     ? x.basePrice +
       x.extraCost
     : 0;
-
 }
 
 
-function payable() {
+function subtotalAfterFreePizza(){
 
   return Math.max(
     0,
@@ -1284,37 +2062,81 @@ function payable() {
 }
 
 
-function freeCola() {
+function openingDiscount(){
 
-  return payable()
-    >= FREE_COLA_AT;
+  if(
+    !openingDiscountActive()
+  ){
+
+    return 0;
+
+  }
+
+
+  return Math.round(
+    subtotalAfterFreePizza() *
+    0.20 *
+    100
+  ) / 100;
+}
+
+
+function payable(){
+
+  return Math.max(
+    0,
+    Math.round(
+      (
+        subtotalAfterFreePizza() -
+        openingDiscount()
+      ) *
+      100
+    ) /
+    100
+  );
 
 }
 
 
-function refreshCart() {
+function freeCola(){
+
+  return gross() >=
+    FREE_COLA_AT;
+}
+
+
+function refreshCart(){
 
   const count =
-    cart.length;
+    cart.reduce(
+      (s,x) =>
+        s +
+        (x.qty || 1),
+      0
+    );
 
 
-  $("cartCount").textContent =
+  $("cartCount")
+    .textContent =
     count;
 
 
-  $("cartTotal").textContent =
+  $("cartTotal")
+    .textContent =
     money(
       payable()
     );
 
 
-  $("grossText").textContent =
+  $("grossText")
+    .textContent =
     money(
       gross()
     );
 
 
-  $("payText").textContent =
+  $("payText")
+    .textContent =
     money(
       payable()
     );
@@ -1328,10 +2150,27 @@ function refreshCart() {
     );
 
 
-  $("freePizzaText").textContent =
+  $("freePizzaText")
+    .textContent =
     "−" +
     money(
       discount()
+    );
+
+
+  $("openingDiscountRow")
+    .classList
+    .toggle(
+      "hidden",
+      openingDiscount() <= 0
+    );
+
+
+  $("openingDiscountText")
+    .textContent =
+    "−" +
+    money(
+      openingDiscount()
     );
 
 
@@ -1347,121 +2186,163 @@ function refreshCart() {
     $("cartItems");
 
 
-  r.innerHTML = "";
+  r.innerHTML =
+    "";
 
 
-  cart.forEach(x => {
+  cart.forEach(
+    x => {
 
-    const d =
-      document.createElement("div");
-
-
-    d.className =
-      "cart-item between";
-
-
-    d.innerHTML = `
-
-      <div>
-
-        <strong>
-          ${x.name}
-        </strong>
-
-        ${
-          x.category === "Pizza"
-            ? '<div class="muted">30 cm</div>'
-            : ""
-        }
-
-        ${
-          x.extras.length
-            ? `
-              <div class="muted">
-
-                Extras:
-                ${x.extras.join(", ")}
-
-                · erstes gratis
-
-                ${
-                  x.extras.length > 1
-                    ? `, +${money(x.extraCost)}`
-                    : ""
-                }
-
-              </div>
-            `
-            : ""
-        }
-
-      </div>
+      const d =
+        document.createElement(
+          "div"
+        );
 
 
-      <div class="row">
-
-        <strong>
-          ${money(x.basePrice + x.extraCost)}
-        </strong>
-
-        <button
-          class="btn secondary small"
-          data-remove="${x.lineId}"
-        >
-          Entfernen
-        </button>
-
-      </div>
-
-    `;
+      d.className =
+        "cart-item";
 
 
-    r.appendChild(d);
+      d.innerHTML =
+        `
 
-  });
+          <div class="between">
+
+            <div>
+
+              <strong>
+                ${x.name}
+              </strong>
+
+              ${
+                x.category === "Pizza"
+                  ? '<div class="muted">30 cm</div>'
+                  : ""
+              }
+
+              ${
+                x.extras.length
+                  ? `
+                    <div class="muted">
+                      Extras:
+                      ${x.extras.join(", ")}
+                    </div>
+                  `
+                  : ""
+              }
+
+            </div>
 
 
-  if (
+            <strong>
+              ${money(lineTotal(x))}
+            </strong>
+
+          </div>
+
+
+          <div class="between" style="margin-top:8px">
+
+            <div class="qtybox">
+
+              <button
+                class="btn secondary small"
+                data-qty="${x.lineId}|minus"
+              >
+                −
+              </button>
+
+              <span class="qtynum">
+                ${x.qty || 1}
+              </span>
+
+              <button
+                class="btn secondary small"
+                data-qty="${x.lineId}|plus"
+              >
+                +
+              </button>
+
+            </div>
+
+
+            <button
+              class="btn secondary small"
+              data-remove="${x.lineId}"
+            >
+              Entfernen
+            </button>
+
+          </div>
+
+        `;
+
+
+      r.appendChild(
+        d
+      );
+
+    }
+  );
+
+
+  if(
     loyalty.freePizzaCredits > 0 &&
     cart.some(isPizza)
-  ) {
+  ){
 
     const d =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
 
     d.className =
       "notice green";
 
 
-    d.innerHTML = `
+    d.innerHTML =
+      `
 
-      Du hast
-      ${loyalty.freePizzaCredits}
-      Gratis-Pizza${loyalty.freePizzaCredits > 1 ? "s" : ""}.
+        Du hast
+        ${loyalty.freePizzaCredits}
+        Gratis-Pizza${
+          loyalty.freePizzaCredits > 1
+            ? "s"
+            : ""
+        }.
 
-      <label style="margin-top:8px">
+        <label style="margin-top:8px">
 
-        <input
-          type="checkbox"
-          id="useFree"
-          ${useFreePizza ? "checked" : ""}
-          style="width:auto"
-        >
+          <input
+            type="checkbox"
+            id="useFree"
+            ${
+              useFreePizza
+                ? "checked"
+                : ""
+            }
+            style="width:auto"
+          >
 
-        Eine Gratis-Pizza verwenden
+          Eine Gratis-Pizza verwenden
 
-      </label>
+        </label>
 
-    `;
+      `;
 
 
-    r.appendChild(d);
+    r.appendChild(
+      d
+    );
 
 
     d
-      .querySelector("#useFree")
-      .onchange = e => {
+      .querySelector(
+        "#useFree"
+      )
+      .onchange =
+      e => {
 
         useFreePizza =
           e.target.checked;
@@ -1473,1336 +2354,188 @@ function refreshCart() {
   }
 
 
-  if (freeCola()) {
+  if(
+    openingDiscountActive()
+  ){
 
     const d =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
+
+
+    d.className =
+      "notice promo";
+
+
+    d.innerHTML =
+      `
+        <strong>
+          🎉 Eröffnungsrabatt −20 %
+        </strong>
+        <br>
+        Wird automatisch abgezogen.
+      `;
+
+
+    r.appendChild(
+      d
+    );
+
+  }
+
+
+  if(
+    freeCola()
+  ){
+
+    const d =
+      document.createElement(
+        "div"
+      );
 
 
     d.className =
       "notice green";
 
 
-    d.innerHTML = `
-
-      <strong>
-        🎁 1× Coca-Cola 1 L GRATIS
-      </strong>
-
-      <br>
-
-      <span class="muted">
-        Automatisch ab 55,00 € Bestellwert.
-      </span>
-
-    `;
-
-
-    r.appendChild(d);
-
-  }
-
-
-  r
-    .querySelectorAll("[data-remove]")
-    .forEach(b => {
-
-      b.onclick = () => {
-
-        cart =
-          cart.filter(
-            x =>
-              x.lineId !==
-              b.dataset.remove
-          );
-
-
-        if (
-          !cart.some(isPizza)
-        ) {
-          useFreePizza =
-            false;
-        }
-
-
-        refreshCart();
-
-      };
-
-    });
-
-}
-
-
-$("openCart").onclick = () => {
-
-  $("cartDialog")
-    .showModal();
-
-  refreshCart();
-
-};
-
-
-$("checkoutBtn").onclick = () => {
-
-  if (
-    gross() < MIN_ORDER
-  ) {
-
-    return alert(
-      "Der Mindestbestellwert beträgt 25,00 €. Die Gratis-Pizza zählt mit zum Mindestbestellwert."
-    );
-
-  }
-
-
-  if (!isOpen()) {
-
-    return alert(
-      "Wir sind aktuell geschlossen."
-    );
-
-  }
-
-
-  if (
-    settings.capacity ===
-    "stop"
-  ) {
-
-    return alert(
-      "Aufgrund hohen Bestellaufkommens sind aktuell keine neuen Bestellungen möglich."
-    );
-
-  }
-
-
-  $("cartDialog")
-    .close();
-
-
-  if (
-    currentUser?.phoneNumber
-  ) {
-
-    $("phone").value =
-      currentUser.phoneNumber;
-
-    $("phone").readOnly =
-      true;
-
-  } else {
-
-    $("phone").readOnly =
-      false;
-
-  }
-
-
-  $("checkoutInfo").innerHTML = `
-
-    Warenwert:
-    <strong>
-      ${money(gross())}
-    </strong>
-
-    <br>
-
-    Zu zahlen:
-    <strong>
-      ${money(payable())}
-    </strong>
-
-    ${
-      freeCola()
-        ? "<br>🎁 Coca-Cola 1 L gratis"
-        : ""
-    }
-
-  `;
-
-
-  $("checkoutDialog")
-    .showModal();
-
-};
-
-
-$("payment").onchange = () => {
-
-  if (
-    $("payment").value === "cash" &&
-    !currentUser?.phoneNumber
-  ) {
-
-    alert(
-      "Barzahlung ist nur mit SMS-verifizierter Telefonnummer möglich."
-    );
-
-  }
-
-};
-
-
-async function idToken() {
-
-  return currentUser
-    ? await currentUser.getIdToken()
-    : null;
-
-}
-
-
-$("checkoutForm").onsubmit = async e => {
-
-  e.preventDefault();
-
-
-  if (
-    gross() < MIN_ORDER
-  ) {
-
-    return alert(
-      "Mindestbestellwert 25,00 €."
-    );
-
-  }
-
-
-  if (
-    $("payment").value === "cash" &&
-    !currentUser?.phoneNumber
-  ) {
-
-    return alert(
-      "Für Barzahlung bitte zuerst Telefonnummer per SMS bestätigen."
-    );
-
-  }
-
-
-  const payload = {
-
-    customer: {
-
-      name:
-        $("name")
-          .value
-          .trim(),
-
-      phone:
-        normalizePhone(
-          $("phone")
-            .value
-        ),
-
-      street:
-        $("street")
-          .value
-          .trim(),
-
-      houseNumber:
-        $("house")
-          .value
-          .trim(),
-
-      postalCode:
-        $("zip")
-          .value
-          .trim(),
-
-      city:
-        $("city")
-          .value
-          .trim()
-
-    },
-
-
-    items:
-      cart,
-
-
-    paymentMethod:
-      $("payment").value,
-
-
-    note:
-      $("note")
-        .value
-        .trim(),
-
-
-    freePizzaApplied:
-      !!freePizzaLine(),
-
-
-    capacityAtOrder:
-      settings.capacity
-
-  };
-
-
-  try {
-
-    const token =
-      await idToken();
-
-
-    const res =
-      await fetch(
-        "/.netlify/functions/create-order",
-        {
-
-          method: "POST",
-
-          headers: {
-
-            "content-type":
-              "application/json",
-
-            ...(
-              token
-                ? {
-                    authorization:
-                      "Bearer " +
-                      token
-                  }
-                : {}
-            )
-
-          },
-
-          body:
-            JSON.stringify(
-              payload
-            )
-
-        }
-      );
-
-
-    const out =
-      await res.json();
-
-
-    if (!res.ok) {
-
-      throw new Error(
-        out.error ||
-        "Bestellung fehlgeschlagen"
-      );
-
-    }
-
-
-    if (
-      out.paymentRequired
-    ) {
-
-      throw new Error(
-        "Online-Zahlung ist noch nicht freigeschaltet."
-      );
-
-    }
-
-
-    alert(
-      "Bestellung wurde gesendet. Bestellnummer: " +
-      out.orderNumber
-    );
-
-
-    cart = [];
-
-    useFreePizza =
-      false;
-
-
-    $("checkoutDialog")
-      .close();
-
-
-    $("checkoutForm")
-      .reset();
-
-
-    refreshCart();
-
-
-    await subscribeCustomerPush(
-      out.orderId,
-      out.trackingToken
-    );
-
-  } catch (err) {
-
-    alert(
-      err.message
-    );
-
-  }
-
-};
-
-
-function setupRecaptcha() {
-
-  if (
-    window.recaptchaVerifier
-  ) {
-    return;
-  }
-
-
-  window.recaptchaVerifier =
-    new firebase.auth.RecaptchaVerifier(
-      "recaptcha-container",
-      {
-        size: "normal"
-      }
-    );
-
-}
-
-
-$("loginBtn").onclick = () => {
-
-  setupRecaptcha();
-
-  $("phoneDialog")
-    .showModal();
-
-};
-
-
-$("sendSms").onclick = async () => {
-
-  try {
-
-    confirmationResult =
-      await auth.signInWithPhoneNumber(
-        normalizePhone(
-          $("loginPhone")
-            .value
-        ),
-        window.recaptchaVerifier
-      );
-
-
-    $("phoneStep")
-      .classList
-      .add("hidden");
-
-
-    $("codeStep")
-      .classList
-      .remove("hidden");
-
-
-    $("phoneMessage").textContent =
-      "SMS-Code wurde gesendet.";
-
-  } catch (e) {
-
-    $("phoneMessage").textContent =
-      e.message;
-
-  }
-
-};
-
-
-$("verifySms").onclick = async () => {
-
-  try {
-
-    await confirmationResult.confirm(
-      $("smsCode")
-        .value
-        .trim()
-    );
-
-
-    $("phoneDialog")
-      .close();
-
-  } catch (e) {
-
-    $("phoneMessage").textContent =
-      "Code ungültig oder abgelaufen.";
-
-  }
-
-};
-
-
-$("logoutBtn").onclick = () =>
-  auth.signOut();
-
-
-async function loadLoyalty() {
-
-  if (
-    !currentUser?.phoneNumber
-  ) {
-    return;
-  }
-
-
-  const token =
-    await idToken();
-
-
-  const r =
-    await fetch(
-      "/.netlify/functions/my-loyalty",
-      {
-        headers: {
-          authorization:
-            "Bearer " +
-            token
-        }
-      }
-    );
-
-
-  if (r.ok) {
-
-    loyalty =
-      await r.json();
-
-  }
-
-
-  $("loyaltyBox")
-    .classList
-    .remove("hidden");
-
-
-  $("loginBtn")
-    .classList
-    .add("hidden");
-
-
-  $("loyaltySummary").textContent =
-    "Angemeldet: " +
-    currentUser.phoneNumber;
-
-
-  $("loyaltyText").innerHTML = `
-
-    Abgeschlossene Bestellungen:
-    <strong>
-      ${loyalty.completedOrders || 0}
-    </strong>
-
-    <br>
-
-    Gratis-Pizzen verfügbar:
-    <strong>
-      ${loyalty.freePizzaCredits || 0}
-    </strong>
-
-  `;
-
-
-  refreshCart();
-
-}
-
-
-auth.onAuthStateChanged(
-  async u => {
-
-    currentUser =
-      u;
-
-
-    const am =
-      new URLSearchParams(
-        location.search
-      ).get("admin") === "1";
-
-
-    if (am) {
-
-      if (
-        u?.email
-          ?.toLowerCase() ===
-        ADMIN_EMAIL
-      ) {
-
-        showAdmin();
-
-      }
-
-
-      return;
-    }
-
-
-    if (
-      u?.phoneNumber
-    ) {
-
-      await loadLoyalty();
-
-    } else {
-
-      $("loyaltyBox")
-        .classList
-        .add("hidden");
-
-
-      $("loginBtn")
-        .classList
-        .remove("hidden");
-
-
-      loyalty = {
-        completedOrders: 0,
-        freePizzaCredits: 0
-      };
-
-
-      useFreePizza =
-        false;
-
-
-      refreshCart();
-
-    }
-
-  }
-);
-
-
-const adminMode =
-  new URLSearchParams(
-    location.search
-  ).get("admin") === "1";
-
-
-if (adminMode) {
-
-  $("customerView")
-    .classList
-    .add("hidden");
-
-
-  $("adminView")
-    .classList
-    .remove("hidden");
-
-
-  $("cartBar")
-    .classList
-    .add("hidden");
-
-}
-
-
-$("adminEmail").value =
-  ADMIN_EMAIL;
-
-
-$("adminLoginBtn").onclick = async () => {
-
-  try {
-
-    await auth.signInWithEmailAndPassword(
-      $("adminEmail")
-        .value
-        .trim(),
-
-      $("adminPassword")
-        .value
-    );
-
-  } catch (e) {
-
-    alert(
-      e.message
-    );
-
-  }
-
-};
-
-
-$("adminLogout").onclick = () =>
-  auth.signOut();
-
-
-document
-  .querySelectorAll(
-    "[data-openmode]"
-  )
-  .forEach(b => {
-
-    b.onclick = () =>
-      adminSetting({
-        manualStatus:
-          b.dataset.openmode
-      });
-
-  });
-
-
-document
-  .querySelectorAll(
-    "[data-capacity]"
-  )
-  .forEach(b => {
-
-    b.onclick = () =>
-      adminSetting({
-        capacity:
-          b.dataset.capacity
-      });
-
-  });
-
-
-async function adminSetting(patch) {
-
-  const token =
-    await idToken();
-
-
-  const r =
-    await fetch(
-      "/.netlify/functions/admin-settings",
-      {
-
-        method: "POST",
-
-        headers: {
-
-          "content-type":
-            "application/json",
-
-          authorization:
-            "Bearer " +
-            token
-
-        },
-
-        body:
-          JSON.stringify(
-            patch
-          )
-
-      }
-    );
-
-
-  if (!r.ok) {
-
-    alert(
-      "Einstellung konnte nicht gespeichert werden."
-    );
-
-  }
-
-}
-
-
-function showAdmin() {
-
-  $("adminLogin")
-    .classList
-    .add("hidden");
-
-
-  $("adminPanel")
-    .classList
-    .remove("hidden");
-
-
-  db
-    .collection("orders")
-    .orderBy(
-      "createdAtClient",
-      "desc"
-    )
-    .limit(100)
-    .onSnapshot(
-      s =>
-        renderOrders(
-          s.docs.map(
-            d => ({
-              id: d.id,
-              ...d.data()
-            })
-          )
-        )
-    );
-
-}
-
-
-function renderOrders(os) {
-
-  const r =
-    $("orders");
-
-
-  r.innerHTML = "";
-
-
-  os.forEach(o => {
-
-    const d =
-      document.createElement("div");
-
-
-    d.className =
-      "admin-order";
-
-
-    const items =
-      (o.items || [])
-        .map(
-          i =>
-            `${i.name}${
-              i.extras?.length
-                ? ` (${i.extras.join(", ")})`
-                : ""
-            }`
-        )
-        .join("<br>");
-
-
-    d.innerHTML = `
-
-      <div class="between">
+    d.innerHTML =
+      `
 
         <strong>
-
-          #${
-            (
-              o.orderNumber ||
-              o.id.slice(0,8)
-            ).toUpperCase()
-          }
-
+          🎁 1× Coca-Cola 1 L GRATIS
         </strong>
-
-        <span class="badge">
-          ${o.status || "new"}
-        </span>
-
-      </div>
-
-
-      <p>
-
-        <strong>
-          ${o.customer?.name || ""}
-        </strong>
-
-        ·
-
-        ${o.customer?.phone || ""}
 
         <br>
 
         <span class="muted">
-
-          ${o.customer?.street || ""}
-          ${o.customer?.houseNumber || ""},
-
-          ${o.customer?.postalCode || ""}
-          ${o.customer?.city || ""}
-
+          Automatisch ab 55,00 € Warenwert.
         </span>
 
-      </p>
+      `;
 
 
-      <div>
-        ${items}
-      </div>
+    r.appendChild(
+      d
+    );
 
-
-      ${
-        o.freeCola
-          ? `
-            <div
-              class="free"
-              style="margin-top:6px"
-            >
-              🎁 Coca-Cola 1 L GRATIS
-            </div>
-          `
-          : ""
-      }
-
-
-      ${
-        o.freePizzaApplied
-          ? `
-            <div class="free">
-              🎁 Gratis-Pizza eingelöst
-            </div>
-          `
-          : ""
-      }
-
-
-      <p>
-        <strong>
-          Zu zahlen:
-          ${money(
-            Number(
-              o.payableTotal || 0
-            )
-          )}
-        </strong>
-      </p>
-
-
-      <div class="row">
-
-        ${
-          o.status === "new"
-            ? `
-
-              <select
-                data-time="${o.id}"
-                style="width:auto"
-              >
-
-                <option value="30">
-                  30 Min
-                </option>
-
-                <option value="40">
-                  40 Min
-                </option>
-
-                <option value="45">
-                  45 Min
-                </option>
-
-                <option value="60">
-                  60 Min
-                </option>
-
-                <option value="75">
-                  75 Min
-                </option>
-
-                <option value="90">
-                  90 Min
-                </option>
-
-                <option value="120">
-                  120 Min
-                </option>
-
-              </select>
-
-
-              <button
-                class="btn green small"
-                data-accept="${o.id}"
-              >
-                Annehmen
-              </button>
-
-            `
-            : ""
-        }
-
-
-        ${
-          ![
-            "completed",
-            "cancelled"
-          ].includes(
-            o.status
-          )
-            ? `
-
-              <button
-                class="btn small"
-                data-status="${o.id}|preparing"
-              >
-                Zubereitung
-              </button>
-
-
-              <button
-                class="btn small"
-                data-status="${o.id}|on_the_way"
-              >
-                Unterwegs
-              </button>
-
-
-              <button
-                class="btn green small"
-                data-status="${o.id}|completed"
-              >
-                Erledigt
-              </button>
-
-
-              <button
-                class="btn red small"
-                data-status="${o.id}|cancelled"
-              >
-                Stornieren
-              </button>
-
-            `
-            : ""
-        }
-
-      </div>
-
-    `;
-
-
-    r.appendChild(d);
-
-  });
+  }
 
 
   r
     .querySelectorAll(
-      "[data-accept]"
+      "[data-remove]"
     )
-    .forEach(b => {
+    .forEach(
+      b => {
 
-      b.onclick = () => {
+        b.onclick =
+          () => {
 
-        const t =
-          r.querySelector(
-            `[data-time="${b.dataset.accept}"]`
-          ).value;
+            cart =
+              cart.filter(
+                x =>
+                  x.lineId !==
+                  b.dataset.remove
+              );
 
 
-        adminOrder(
-          b.dataset.accept,
-          "accepted",
-          Number(t)
-        );
+            if(
+              !cart.some(isPizza)
+            ){
 
-      };
+              useFreePizza =
+                false;
 
-    });
+            }
+
+
+            refreshCart();
+
+          };
+
+      }
+    );
 
 
   r
     .querySelectorAll(
-      "[data-status]"
+      "[data-qty]"
     )
-    .forEach(b => {
+    .forEach(
+      b => {
 
-      b.onclick = () => {
+        b.onclick =
+          () => {
 
-        const [id,st] =
-          b.dataset.status
-            .split("|");
-
-
-        adminOrder(
-          id,
-          st,
-          null
-        );
-
-      };
-
-    });
-
-}
+            const [
+              id,
+              action
+            ] =
+              b.dataset.qty
+                .split("|");
 
 
-async function adminOrder(
-  orderId,
-  status,
-  deliveryMinutes
-) {
-
-  const token =
-    await idToken();
+            const item =
+              cart.find(
+                x =>
+                  x.lineId === id
+              );
 
 
-  const r =
-    await fetch(
-      "/.netlify/functions/admin-order",
-      {
+            if(
+              !item
+            ){
+              return;
+            }
 
-        method: "POST",
 
-        headers: {
+            if(
+              action === "plus"
+            ){
 
-          "content-type":
-            "application/json",
+              item.qty =
+                (item.qty || 1) +
+                1;
 
-          authorization:
-            "Bearer " +
-            token
+            }else{
 
-        },
+              item.qty =
+                (item.qty || 1) -
+                1;
 
-        body:
-          JSON.stringify({
-            orderId,
-            status,
-            deliveryMinutes
-          })
+
+              if(
+                item.qty <= 0
+              ){
+
+                cart =
+                  cart.filter(
+                    x =>
+                      x.lineId !==
+                      id
+                  );
+
+              }
+
+            }
+
+
+            if(
+              !cart.some(isPizza)
+            ){
+
+              useFreePizza =
+                false;
+
+            }
+
+
+            refreshCart();
+
+          };
 
       }
     );
 
-
-  if (!r.ok) {
-
-    const x =
-      await r
-        .json()
-        .catch(
-          () => ({})
-        );
-
-
-    alert(
-      x.error ||
-      "Status konnte nicht geändert werden."
-    );
-
-  }
-
 }
-
-
-function vapidKeyToBytes(value) {
-
-  const base64 =
-    value
-      .replace(/-/g,"+")
-      .replace(/_/g,"/");
-
-
-  const padded =
-    base64 +
-    "=".repeat(
-      (
-        4 -
-        base64.length % 4
-      ) % 4
-    );
-
-
-  return Uint8Array.from(
-    atob(padded),
-    c =>
-      c.charCodeAt(0)
-  );
-
-}
-
-
-async function pushSubscription() {
-
-  if (
-    !(
-      "serviceWorker" in navigator
-    ) ||
-    !(
-      "PushManager" in window
-    )
-  ) {
-
-    throw new Error(
-      "Push wird auf diesem Gerät/Browser nicht unterstützt."
-    );
-
-  }
-
-
-  const reg =
-    await navigator
-      .serviceWorker
-      .register(
-        "/service-worker.js"
-      );
-
-
-  const cfg =
-    await (
-      await fetch(
-        "/.netlify/functions/push-config"
-      )
-    ).json();
-
-
-  if (!cfg.publicKey) {
-
-    throw new Error(
-      "Push ist noch nicht vollständig eingerichtet."
-    );
-
-  }
-
-
-  if (
-    await Notification.requestPermission()
-    !==
-    "granted"
-  ) {
-
-    throw new Error(
-      "Push wurde nicht erlaubt."
-    );
-
-  }
-
-
-  return reg
-    .pushManager
-    .subscribe({
-
-      userVisibleOnly:
-        true,
-
-      applicationServerKey:
-        vapidKeyToBytes(
-          cfg.publicKey
-        )
-
-    });
-
-}
-
-
-$("enableAdminPush").onclick = async () => {
-
-  try {
-
-    const sub =
-      await pushSubscription();
-
-
-    const token =
-      await idToken();
-
-
-    await fetch(
-      "/.netlify/functions/push-subscribe",
-      {
-
-        method: "POST",
-
-        headers: {
-
-          "content-type":
-            "application/json",
-
-          authorization:
-            "Bearer " +
-            token
-
-        },
-
-        body:
-          JSON.stringify({
-
-            type:
-              "admin",
-
-            subscription:
-              sub
-
-          })
-
-      }
-    );
-
-
-    alert(
-      "Push ist aktiviert."
-    );
-
-  } catch (e) {
-
-    alert(
-      e.message
-    );
-
-  }
-
-};
-
-
-async function subscribeCustomerPush(
-  orderId,
-  trackingToken
-) {
-
-  try {
-
-    const sub =
-      await pushSubscription();
-
-
-    await fetch(
-      "/.netlify/functions/push-subscribe",
-      {
-
-        method: "POST",
-
-        headers: {
-          "content-type":
-            "application/json"
-        },
-
-        body:
-          JSON.stringify({
-
-            type:
-              "order",
-
-            orderId,
-
-            trackingToken,
-
-            subscription:
-              sub
-
-          })
-
-      }
-    );
-
-  } catch (e) {
-
-    console.log(e);
-
-  }
-
-}
-
-
-renderMenu();
-
-refreshCart();
-
-renderStatus();
-
-setInterval(
-  renderStatus,
-  30000
-);
-
-</script>
-
-</body>
-</html>
