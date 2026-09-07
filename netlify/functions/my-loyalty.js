@@ -4,59 +4,133 @@ const {
   json
 } = require("./_firebase");
 
-exports.handler = async event => {
-  try {
-    const user =
-      await userFromEvent(event);
 
-    if (!user?.phone_number) {
-      return json(401, {
+exports.handler = async event => {
+
+  if (event.httpMethod !== "GET") {
+
+    return json(
+      405,
+      {
         error:
-          "Telefon-Anmeldung erforderlich"
-      });
+          "Methode nicht erlaubt"
+      }
+    );
+
+  }
+
+
+  try {
+
+    const user =
+      await userFromEvent(
+        event
+      );
+
+
+    if (
+      !user ||
+      !user.phone_number
+    ) {
+
+      return json(
+        401,
+        {
+          error:
+            "Telefon-Anmeldung erforderlich"
+        }
+      );
+
     }
 
-    const loyaltyRef = db
-      .collection("loyalty")
-      .doc(user.uid);
+
+    const loyaltyRef =
+      db
+        .collection("loyalty")
+        .doc(user.uid);
+
 
     const snapshot =
       await loyaltyRef.get();
 
-    if (!snapshot.exists) {
-      await loyaltyRef.set({
-        phone: user.phone_number,
-        completedOrders: 0,
-        freePizzaCredits: 0
-      });
 
-      return json(200, {
-        completedOrders: 0,
-        freePizzaCredits: 0
-      });
+    if (
+      !snapshot.exists
+    ) {
+
+      await loyaltyRef.set(
+        {
+
+          phone:
+            user.phone_number,
+
+          completedOrders:
+            0,
+
+          freePizzaCredits:
+            0
+
+        },
+        {
+          merge: true
+        }
+      );
+
+
+      return json(
+        200,
+        {
+
+          completedOrders:
+            0,
+
+          freePizzaCredits:
+            0
+
+        }
+      );
+
     }
 
-    const data = snapshot.data();
 
-    return json(200, {
-      completedOrders:
-        Number(
-          data.completedOrders || 0
-        ),
+    const data =
+      snapshot.data();
 
-      freePizzaCredits:
-        Number(
-          data.freePizzaCredits || 0
-        )
-    });
+
+    return json(
+      200,
+      {
+
+        completedOrders:
+          Number(
+            data.completedOrders ||
+            0
+          ),
+
+        freePizzaCredits:
+          Number(
+            data.freePizzaCredits ||
+            0
+          )
+
+      }
+    );
+
 
   } catch (error) {
+
     console.error(error);
 
-    return json(500, {
-      error:
-        error.message ||
-        "Treuekonto konnte nicht geladen werden"
-    });
+
+    return json(
+      500,
+      {
+        error:
+          error.message ||
+          "Treuekonto konnte nicht geladen werden"
+      }
+    );
+
   }
+
 };
