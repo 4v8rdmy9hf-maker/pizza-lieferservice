@@ -1,14 +1,12 @@
 {
-  "name": "Pizzeria TC Ehringshausen",
-  "short_name": "Pizzeria TC",
-  "description": "Pizza Lieferservice Pizzeria TC Ehringshausen",
+  "name": "Pizzeria La Piazza Ehringshausen",
+  "short_name": "La Piazza",
+  "description": "Bestell-App der Pizzeria La Piazza in Ehringshausen",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#111111",
+  "background_color": "#0d0d0f",
   "theme_color": "#111111",
-  "lang": "de-DE",
   "icons": [
     {
       "src": "/icon-192.png",
