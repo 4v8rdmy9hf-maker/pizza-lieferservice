@@ -2539,3 +2539,2041 @@ function refreshCart(){
     );
 
 }
+$("openCart").onclick = () => {
+  refreshCart();
+  $("cartDialog").showModal();
+};
+
+$("checkoutBtn").onclick = () => {
+
+  if (!cart.length) {
+    alert("Dein Warenkorb ist leer.");
+    return;
+  }
+
+  if (gross() < MIN_ORDER) {
+    alert(
+      `Mindestbestellwert: ${money(MIN_ORDER)}.`
+    );
+    return;
+  }
+
+  if (!isOpen()) {
+    alert("Die Pizzeria ist aktuell geschlossen.");
+    return;
+  }
+
+  if (settings.capacity === "stop") {
+    alert(
+      "Aktuell besteht ein Bestellstopp. Bitte später erneut versuchen."
+    );
+    return;
+  }
+
+  if (currentUser?.phoneNumber) {
+    $("phone").value =
+      currentUser.phoneNumber;
+  }
+
+  $("checkoutInfo").innerHTML =
+    settings.capacity === "normal"
+      ? "Nach Eingang deiner Bestellung bestätigen wir die voraussichtliche Lieferzeit."
+      : `Aktuell beträgt die Richtzeit ca. <strong>${settings.capacity} Minuten</strong>.`;
+
+  $("cartDialog").close();
+  $("checkoutDialog").showModal();
+};
+
+
+$("checkoutForm").onsubmit = async e => {
+
+  e.preventDefault();
+
+  const submit =
+    e.target.querySelector(
+      'button[type="submit"]'
+    );
+
+  submit.disabled = true;
+  submit.textContent =
+    "Wird gesendet…";
+
+  try {
+
+    if (!cart.length) {
+      throw new Error(
+        "Der Warenkorb ist leer."
+      );
+    }
+
+    if (gross() < MIN_ORDER) {
+      throw new Error(
+        "Mindestbestellwert 25,00 €."
+      );
+    }
+
+    if (!isOpen()) {
+      throw new Error(
+        "Die Pizzeria ist aktuell geschlossen."
+      );
+    }
+
+    if (settings.capacity === "stop") {
+      throw new Error(
+        "Aktuell besteht ein Bestellstopp."
+      );
+    }
+
+    const phone =
+      normalizePhone(
+        $("phone").value
+      );
+
+    const paymentMethod =
+      $("payment").value;
+
+    if (
+      paymentMethod === "cash" &&
+      (
+        !currentUser?.phoneNumber ||
+        normalizePhone(
+          currentUser.phoneNumber
+        ) !== phone
+      )
+    ) {
+      throw new Error(
+        "Für Barzahlung muss die Telefonnummer zuerst per SMS bestätigt werden."
+      );
+    }
+
+    const items = [];
+
+    cart.forEach(item => {
+
+      for (
+        let i = 0;
+        i < (item.qty || 1);
+        i++
+      ) {
+
+        items.push({
+          id:item.id,
+          extras:item.extras || []
+        });
+
+      }
+
+    });
+
+    const freeLine =
+      freePizzaLine();
+
+    const payload = {
+
+      customer:{
+        name:
+          $("name").value.trim(),
+
+        phone,
+
+        street:
+          $("street").value.trim(),
+
+        houseNumber:
+          $("house").value.trim(),
+
+        postalCode:
+          $("zip").value.trim(),
+
+        city:
+          $("city").value.trim()
+      },
+
+      items,
+
+      paymentMethod,
+
+      note:
+        $("note").value.trim(),
+
+      freePizzaApplied:
+        !!freeLine,
+
+      freePizzaLineId:
+        freeLine
+          ? freeLine.lineId
+          : null,
+
+      freePizzaItemId:
+        freeLine
+          ? freeLine.id
+          : null,
+
+      capacityAtOrder:
+        settings.capacity
+
+    };
+
+    let token = null;
+
+    if (auth.currentUser) {
+      token =
+        await auth.currentUser
+          .getIdToken();
+    }
+
+    const response =
+      await fetch(
+        "/.netlify/functions/create-order",
+        {
+          method:"POST",
+          headers:{
+            "content-type":
+              "application/json",
+            ...(token
+              ? {
+                  authorization:
+                    `Bearer ${token}`
+                }
+              : {})
+          },
+          body:
+            JSON.stringify(
+              payload
+            )
+        }
+      );
+
+    const result =
+      await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.error ||
+        "Bestellung konnte nicht gesendet werden."
+      );
+    }
+
+    localStorage.setItem(
+      "lastOrder",
+      JSON.stringify({
+        orderId:
+          result.orderId,
+        orderNumber:
+          result.orderNumber,
+        trackingToken:
+          result.trackingToken
+      })
+    );
+
+    cart = [];
+    useFreePizza = false;
+
+    refreshCart();
+
+    $("checkoutDialog").close();
+
+    await showLastOrder();
+
+    try {
+      await subscribeOrderPush(
+        result.orderId,
+        result.trackingToken
+      );
+    } catch (pushError) {
+      console.error(
+        "Kunden-Push:",
+        pushError
+      );
+    }
+
+    alert(
+      `Bestellung #${result.orderNumber} wurde übermittelt.`
+    );
+
+    if (currentUser) {
+      loadLoyalty();
+    }
+
+  } catch (error) {
+
+    alert(
+      error.message ||
+      "Bestellung fehlgeschlagen."
+    );
+
+  } finally {
+
+    submit.disabled = false;
+    submit.textContent =
+      "Bestellung absenden";
+
+  }
+
+};
+
+
+async function authHeaders() {
+
+  const user =
+    auth.currentUser;
+
+  if (!user) {
+    return {};
+  }
+
+  const token =
+    await user.getIdToken();
+
+  return {
+    authorization:
+      `Bearer ${token}`
+  };
+
+}
+
+
+async function loadLoyalty() {
+
+  if (
+    !auth.currentUser ||
+    !auth.currentUser.phoneNumber
+  ) {
+
+    loyalty = {
+      completedOrders:0,
+      freePizzaCredits:0
+    };
+
+    renderLoyalty();
+    return;
+  }
+
+  try {
+
+    const headers =
+      await authHeaders();
+
+    const r =
+      await fetch(
+        "/.netlify/functions/my-loyalty",
+        {
+          headers
+        }
+      );
+
+    const data =
+      await r.json();
+
+    if (!r.ok) {
+      throw new Error(
+        data.error ||
+        "Treuekonto konnte nicht geladen werden."
+      );
+    }
+
+    loyalty = {
+      completedOrders:
+        Number(
+          data.completedOrders ||
+          0
+        ),
+
+      freePizzaCredits:
+        Number(
+          data.freePizzaCredits ||
+          0
+        )
+    };
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+  }
+
+  renderLoyalty();
+  refreshCart();
+}
+
+
+function renderLoyalty() {
+
+  const logged =
+    !!currentUser?.phoneNumber;
+
+  $("loginBtn")
+    .classList
+    .toggle(
+      "hidden",
+      logged
+    );
+
+  $("loyaltyBox")
+    .classList
+    .toggle(
+      "hidden",
+      !logged
+    );
+
+  if (!logged) {
+
+    $("loyaltySummary")
+      .textContent =
+      "Jede 10. abgeschlossene Bestellung = 1 Gratis-Pizza.";
+
+    return;
+  }
+
+  $("loyaltySummary")
+    .textContent =
+    `Angemeldet: ${currentUser.phoneNumber}`;
+
+  $("loyaltyText")
+    .innerHTML =
+    `
+      Abgeschlossene Bestellungen:
+      <strong>
+        ${loyalty.completedOrders}
+      </strong>
+
+      <br>
+
+      Gratis-Pizzen:
+      <strong class="free">
+        ${loyalty.freePizzaCredits}
+      </strong>
+    `;
+
+}
+
+
+auth.onAuthStateChanged(
+  user => {
+
+    currentUser =
+      user;
+
+    renderLoyalty();
+
+    if (
+      user?.phoneNumber
+    ) {
+      loadLoyalty();
+    }
+
+    if (
+      location.search.includes(
+        "admin=1"
+      )
+    ) {
+
+      updateAdminAuthUI(
+        user
+      );
+
+    }
+
+  }
+);
+
+
+$("loginBtn").onclick = () => {
+
+  $("phoneStep")
+    .classList
+    .remove(
+      "hidden"
+    );
+
+  $("codeStep")
+    .classList
+    .add(
+      "hidden"
+    );
+
+  $("phoneMessage")
+    .textContent =
+    "";
+
+  $("phoneDialog")
+    .showModal();
+
+};
+
+
+$("logoutBtn").onclick =
+async () => {
+
+  await auth.signOut();
+
+  loyalty = {
+    completedOrders:0,
+    freePizzaCredits:0
+  };
+
+  useFreePizza =
+    false;
+
+  refreshCart();
+
+};
+
+
+$("sendSms").onclick =
+async () => {
+
+  const btn =
+    $("sendSms");
+
+  btn.disabled =
+    true;
+
+  try {
+
+    const phone =
+      normalizePhone(
+        $("loginPhone").value
+      );
+
+    if (
+      !window.recaptchaVerifier
+    ) {
+
+      window.recaptchaVerifier =
+        new firebase.auth
+          .RecaptchaVerifier(
+            "recaptcha-container",
+            {
+              size:"normal"
+            }
+          );
+
+    }
+
+    confirmationResult =
+      await auth
+        .signInWithPhoneNumber(
+          phone,
+          window.recaptchaVerifier
+        );
+
+    $("phoneStep")
+      .classList
+      .add(
+        "hidden"
+      );
+
+    $("codeStep")
+      .classList
+      .remove(
+        "hidden"
+      );
+
+    $("phoneMessage")
+      .textContent =
+      "SMS-Code wurde gesendet.";
+
+  } catch (error) {
+
+    $("phoneMessage")
+      .textContent =
+      error.message;
+
+    try {
+      window.recaptchaVerifier
+        ?.clear();
+    } catch (e) {}
+
+    window.recaptchaVerifier =
+      null;
+
+  } finally {
+
+    btn.disabled =
+      false;
+
+  }
+
+};
+
+
+$("verifySms").onclick =
+async () => {
+
+  try {
+
+    if (
+      !confirmationResult
+    ) {
+      throw new Error(
+        "Bitte zuerst einen SMS-Code anfordern."
+      );
+    }
+
+    await confirmationResult
+      .confirm(
+        $("smsCode").value.trim()
+      );
+
+    $("phoneDialog")
+      .close();
+
+  } catch (error) {
+
+    $("phoneMessage")
+      .textContent =
+      error.message;
+
+  }
+
+};
+
+
+function urlBase64ToUint8Array(
+  base64String
+) {
+
+  const padding =
+    "=".repeat(
+      (
+        4 -
+        base64String.length % 4
+      ) % 4
+    );
+
+  const base64 =
+    (
+      base64String +
+      padding
+    )
+      .replace(
+        /-/g,
+        "+"
+      )
+      .replace(
+        /_/g,
+        "/"
+      );
+
+  const rawData =
+    atob(base64);
+
+  return Uint8Array.from(
+    [...rawData]
+      .map(
+        char =>
+          char.charCodeAt(0)
+      )
+  );
+
+}
+
+
+async function getPushSubscription() {
+
+  if (
+    !(
+      "serviceWorker" in
+      navigator
+    ) ||
+    !(
+      "PushManager" in
+      window
+    )
+  ) {
+
+    throw new Error(
+      "Push wird auf diesem Gerät/Browser nicht unterstützt."
+    );
+
+  }
+
+  const permission =
+    await Notification
+      .requestPermission();
+
+  if (
+    permission !== "granted"
+  ) {
+
+    throw new Error(
+      "Benachrichtigungen wurden nicht erlaubt."
+    );
+
+  }
+
+  const registration =
+    await navigator
+      .serviceWorker
+      .register(
+        "/service-worker.js"
+      );
+
+  const configResponse =
+    await fetch(
+      "/.netlify/functions/push-config"
+    );
+
+  const config =
+    await configResponse
+      .json();
+
+  if (
+    !config.publicKey
+  ) {
+
+    throw new Error(
+      "Push-Konfiguration fehlt."
+    );
+
+  }
+
+  let subscription =
+    await registration
+      .pushManager
+      .getSubscription();
+
+  if (
+    !subscription
+  ) {
+
+    subscription =
+      await registration
+        .pushManager
+        .subscribe({
+          userVisibleOnly:true,
+          applicationServerKey:
+            urlBase64ToUint8Array(
+              config.publicKey
+            )
+        });
+
+  }
+
+  return subscription;
+}
+
+
+async function subscribeOrderPush(
+  orderId,
+  trackingToken
+) {
+
+  const subscription =
+    await getPushSubscription();
+
+  const r =
+    await fetch(
+      "/.netlify/functions/push-subscribe",
+      {
+        method:"POST",
+        headers:{
+          "content-type":
+            "application/json"
+        },
+        body:
+          JSON.stringify({
+            type:"order",
+            orderId,
+            trackingToken,
+            subscription
+          })
+      }
+    );
+
+  if (!r.ok) {
+
+    const data =
+      await r.json();
+
+    throw new Error(
+      data.error ||
+      "Push konnte nicht aktiviert werden."
+    );
+
+  }
+
+}
+
+
+async function showLastOrder() {
+
+  const raw =
+    localStorage.getItem(
+      "lastOrder"
+    );
+
+  if (!raw) {
+
+    $("lastOrderCard")
+      .classList
+      .add(
+        "hidden"
+      );
+
+    return;
+
+  }
+
+  try {
+
+    const order =
+      JSON.parse(raw);
+
+    const params =
+      new URLSearchParams({
+        id:
+          order.orderId,
+        token:
+          order.trackingToken
+      });
+
+    const r =
+      await fetch(
+        "/.netlify/functions/order-status?" +
+        params.toString()
+      );
+
+    const data =
+      await r.json();
+
+    if (!r.ok) {
+      throw new Error(
+        data.error
+      );
+    }
+
+    $("lastOrderCard")
+      .classList
+      .remove(
+        "hidden"
+      );
+
+    const statusNames = {
+      new:"Eingegangen",
+      accepted:"Angenommen",
+      preparing:"In Zubereitung",
+      on_the_way:"Unterwegs",
+      completed:"Abgeschlossen",
+      cancelled:"Storniert",
+      awaiting_payment:
+        "Zahlung ausstehend"
+    };
+
+    $("lastOrderText")
+      .innerHTML =
+      `
+        #${data.orderNumber}
+        ·
+        ${
+          statusNames[
+            data.status
+          ] ||
+          data.status
+        }
+
+        ${
+          data.deliveryMinutes
+            ? ` · ca. ${data.deliveryMinutes} Min.`
+            : ""
+        }
+
+        ·
+        ${money(
+          Number(
+            data.payableTotal ||
+            0
+          )
+        )}
+      `;
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+  }
+
+}
+
+
+$("refreshOrderStatus")
+  .onclick =
+  showLastOrder;
+
+
+const adminMode =
+  new URLSearchParams(
+    location.search
+  ).get("admin") === "1";
+
+
+if (adminMode) {
+
+  $("customerView")
+    .classList
+    .add(
+      "hidden"
+    );
+
+  $("adminView")
+    .classList
+    .remove(
+      "hidden"
+    );
+
+  $("cartBar")
+    .classList
+    .add(
+      "hidden"
+    );
+
+}
+
+
+function isAdminUser(
+  user
+) {
+
+  return (
+    user?.email ||
+    ""
+  ).toLowerCase() ===
+    ADMIN_EMAIL;
+
+}
+
+
+function updateAdminAuthUI(
+  user
+) {
+
+  const ok =
+    isAdminUser(
+      user
+    );
+
+  $("adminLogin")
+    .classList
+    .toggle(
+      "hidden",
+      ok
+    );
+
+  $("adminPanel")
+    .classList
+    .toggle(
+      "hidden",
+      !ok
+    );
+
+  $("adminLogout")
+    .classList
+    .toggle(
+      "hidden",
+      !ok
+    );
+
+  if (ok) {
+    startOrders();
+  }
+
+}
+
+
+$("adminLoginBtn")
+  .onclick =
+async () => {
+
+  try {
+
+    await auth
+      .signInWithEmailAndPassword(
+        $("adminEmail")
+          .value
+          .trim(),
+
+        $("adminPassword")
+          .value
+      );
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+
+  }
+
+};
+
+
+$("adminLogout")
+  .onclick =
+async () => {
+
+  await auth.signOut();
+
+};
+
+
+async function adminPost(
+  path,
+  body
+) {
+
+  const headers =
+    await authHeaders();
+
+  const r =
+    await fetch(
+      `/.netlify/functions/${path}`,
+      {
+        method:"POST",
+        headers:{
+          "content-type":
+            "application/json",
+          ...headers
+        },
+        body:
+          JSON.stringify(
+            body
+          )
+      }
+    );
+
+  const data =
+    await r.json();
+
+  if (!r.ok) {
+
+    throw new Error(
+      data.error ||
+      "Aktion fehlgeschlagen."
+    );
+
+  }
+
+  return data;
+}
+
+
+document
+  .querySelectorAll(
+    "[data-openmode]"
+  )
+  .forEach(
+    b => {
+
+      b.onclick =
+      async () => {
+
+        try {
+
+          await adminPost(
+            "admin-settings",
+            {
+              manualStatus:
+                b.dataset.openmode
+            }
+          );
+
+        } catch (error) {
+
+          alert(
+            error.message
+          );
+
+        }
+
+      };
+
+    }
+  );
+
+
+document
+  .querySelectorAll(
+    "[data-capacity]"
+  )
+  .forEach(
+    b => {
+
+      b.onclick =
+      async () => {
+
+        try {
+
+          await adminPost(
+            "admin-settings",
+            {
+              capacity:
+                b.dataset.capacity
+            }
+          );
+
+        } catch (error) {
+
+          alert(
+            error.message
+          );
+
+        }
+
+      };
+
+    }
+  );
+
+
+$("enableAdminPush")
+  .onclick =
+async () => {
+
+  try {
+
+    const subscription =
+      await getPushSubscription();
+
+    await adminPost(
+      "push-subscribe",
+      {
+        type:"admin",
+        subscription
+      }
+    );
+
+    alert(
+      "Push-Benachrichtigungen sind aktiviert."
+    );
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+
+  }
+
+};
+
+
+let ordersUnsubscribe =
+  null;
+
+let cachedOrders =
+  [];
+
+
+function startOrders() {
+
+  if (
+    ordersUnsubscribe
+  ) {
+    return;
+  }
+
+  ordersUnsubscribe =
+    db
+      .collection(
+        "orders"
+      )
+      .orderBy(
+        "createdAt",
+        "desc"
+      )
+      .limit(100)
+      .onSnapshot(
+        snapshot => {
+
+          cachedOrders =
+            snapshot.docs.map(
+              doc => ({
+                id:doc.id,
+                ...doc.data()
+              })
+            );
+
+          renderAdminOrders();
+          renderOrderOverview();
+
+        },
+        error => {
+
+          console.error(
+            error
+          );
+
+          $("orders")
+            .innerHTML =
+            `<div class="notice red">
+              Bestellungen konnten nicht geladen werden.
+            </div>`;
+
+        }
+      );
+
+}
+
+
+function formatDate(
+  value
+) {
+
+  try {
+
+    const date =
+      value?.toDate
+        ? value.toDate()
+        : new Date(
+            value
+          );
+
+    return date.toLocaleString(
+      "de-DE"
+    );
+
+  } catch {
+
+    return "–";
+
+  }
+
+}
+
+
+function paymentName(
+  method
+) {
+
+  const names = {
+    cash:
+      "Barzahlung bei Lieferung",
+    card_delivery:
+      "Kartenzahlung bei Lieferung",
+    online:
+      "Online"
+  };
+
+  return names[method] ||
+    method ||
+    "–";
+
+}
+
+
+function statusName(
+  status
+) {
+
+  const names = {
+    new:"Neu",
+    accepted:"Angenommen",
+    preparing:"In Zubereitung",
+    on_the_way:"Unterwegs",
+    completed:"Erledigt",
+    cancelled:"Storniert",
+    awaiting_payment:
+      "Zahlung ausstehend"
+  };
+
+  return names[status] ||
+    status ||
+    "–";
+
+}
+
+
+function orderItemsHTML(
+  order
+) {
+
+  const items =
+    Array.isArray(
+      order.items
+    )
+      ? order.items
+      : [];
+
+  if (!items.length) {
+    return `
+      <div class="muted">
+        Keine Artikel gespeichert.
+      </div>
+    `;
+  }
+
+  const grouped =
+    new Map();
+
+  items.forEach(
+    item => {
+
+      const extras =
+        Array.isArray(
+          item.extras
+        )
+          ? item.extras
+          : [];
+
+      const key =
+        `${item.id || item.name}|${extras.join("|")}`;
+
+      if (
+        !grouped.has(key)
+      ) {
+
+        grouped.set(
+          key,
+          {
+            ...item,
+            extras,
+            qty:0
+          }
+        );
+
+      }
+
+      grouped.get(key)
+        .qty +=
+        Number(
+          item.qty ||
+          1
+        );
+
+    }
+  );
+
+  return [
+    ...grouped.values()
+  ]
+    .map(
+      item => {
+
+        const unit =
+          Number(
+            item.basePrice ||
+            0
+          ) +
+          Number(
+            item.extraCost ||
+            0
+          );
+
+        return `
+
+          <div class="order-detail">
+
+            <div class="between">
+
+              <strong>
+                ${item.qty}×
+                ${item.name || "Artikel"}
+              </strong>
+
+              <strong>
+                ${money(
+                  unit *
+                  item.qty
+                )}
+              </strong>
+
+            </div>
+
+            ${
+              item.category ===
+              "Pizza"
+                ? `
+                  <div class="muted">
+                    30 cm
+                  </div>
+                `
+                : ""
+            }
+
+            ${
+              item.extras.length
+                ? `
+                  <div style="margin-top:5px">
+                    <strong>
+                      Extras:
+                    </strong>
+                    ${item.extras.join(", ")}
+                  </div>
+                `
+                : ""
+            }
+
+          </div>
+
+        `;
+
+      }
+    )
+    .join("");
+
+}
+
+
+function customerHTML(
+  order
+) {
+
+  const c =
+    order.customer ||
+    {};
+
+  return `
+
+    <div class="order-detail">
+
+      <strong>
+        Kunde
+      </strong>
+
+      <div style="margin-top:5px">
+
+        ${c.name || "–"}
+
+        <br>
+
+        <a href="tel:${c.phone || ""}">
+          ${c.phone || "–"}
+        </a>
+
+        <br>
+
+        ${c.street || ""}
+        ${c.houseNumber || ""}
+
+        <br>
+
+        ${c.postalCode || ""}
+        ${c.city || ""}
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+function totalsHTML(
+  order
+) {
+
+  return `
+
+    <div class="order-detail">
+
+      <div class="between">
+        <span>Warenwert</span>
+        <strong>
+          ${money(
+            Number(
+              order.grossTotal ||
+              0
+            )
+          )}
+        </strong>
+      </div>
+
+      ${
+        order.freePizzaApplied
+          ? `
+            <div class="between free">
+              <span>Gratis-Pizza</span>
+              <strong>
+                −${money(
+                  Number(
+                    order.freePizzaDiscount ||
+                    0
+                  )
+                )}
+              </strong>
+            </div>
+          `
+          : ""
+      }
+
+      ${
+        Number(
+          order.openingDiscount ||
+          0
+        ) > 0
+          ? `
+            <div class="between free">
+              <span>
+                Eröffnungsrabatt −20 %
+              </span>
+              <strong>
+                −${money(
+                  Number(
+                    order.openingDiscount
+                  )
+                )}
+              </strong>
+            </div>
+          `
+          : ""
+      }
+
+      ${
+        order.freeCola
+          ? `
+            <div class="free">
+              🎁 1× Coca-Cola 1 L GRATIS
+            </div>
+          `
+          : ""
+      }
+
+      <hr>
+
+      <div class="between">
+
+        <strong>
+          Gesamt
+        </strong>
+
+        <strong>
+          ${money(
+            Number(
+              order.payableTotal ||
+              0
+            )
+          )}
+        </strong>
+
+      </div>
+
+      <div class="muted" style="margin-top:5px">
+        ${paymentName(
+          order.paymentMethod
+        )}
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+function renderAdminOrders() {
+
+  const root =
+    $("orders");
+
+  if (!cachedOrders.length) {
+
+    root.innerHTML =
+      `
+        <div class="card muted">
+          Noch keine Bestellungen.
+        </div>
+      `;
+
+    return;
+  }
+
+  root.innerHTML =
+    cachedOrders
+      .filter(
+        order =>
+          ![
+            "completed",
+            "cancelled"
+          ].includes(
+            order.status
+          )
+      )
+      .map(
+        order => {
+
+          const c =
+            order.customer ||
+            {};
+
+          return `
+
+            <div class="admin-order">
+
+              <div class="between">
+
+                <div>
+
+                  <strong>
+                    #${order.orderNumber || order.id.slice(0,8)}
+                  </strong>
+
+                  <div class="muted">
+                    ${formatDate(
+                      order.createdAt ||
+                      order.createdAtClient
+                    )}
+                  </div>
+
+                </div>
+
+                <span class="status">
+                  ${statusName(
+                    order.status
+                  )}
+                </span>
+
+              </div>
+
+
+              <div style="margin-top:10px">
+
+                <strong>
+                  ${c.name || "Kunde"}
+                </strong>
+
+                ·
+
+                <a href="tel:${c.phone || ""}">
+                  ${c.phone || ""}
+                </a>
+
+              </div>
+
+
+              <div class="muted">
+
+                ${c.street || ""}
+                ${c.houseNumber || ""},
+
+                ${c.postalCode || ""}
+                ${c.city || ""}
+
+              </div>
+
+
+              ${orderItemsHTML(order)}
+
+              ${totalsHTML(order)}
+
+
+              ${
+                order.note
+                  ? `
+                    <div class="notice" style="margin-top:8px">
+                      <strong>
+                        Hinweis:
+                      </strong>
+                      ${order.note}
+                    </div>
+                  `
+                  : ""
+              }
+
+
+              <div class="row" style="margin-top:10px">
+
+                ${
+                  order.status === "new"
+                    ? `
+                      <select
+                        id="time-${order.id}"
+                        style="width:auto"
+                      >
+                        <option value="30">30 Min</option>
+                        <option value="40">40 Min</option>
+                        <option value="45">45 Min</option>
+                        <option value="60">60 Min</option>
+                        <option value="75">75 Min</option>
+                        <option value="90">90 Min</option>
+                        <option value="120">120 Min</option>
+                      </select>
+
+                      <button
+                        class="btn green small"
+                        data-order-action="${order.id}|accepted"
+                      >
+                        Annehmen
+                      </button>
+                    `
+                    : ""
+                }
+
+                ${
+                  order.status === "accepted"
+                    ? `
+                      <button
+                        class="btn small"
+                        data-order-action="${order.id}|preparing"
+                      >
+                        Zubereitung
+                      </button>
+                    `
+                    : ""
+                }
+
+                ${
+                  order.status === "preparing"
+                    ? `
+                      <button
+                        class="btn small"
+                        data-order-action="${order.id}|on_the_way"
+                      >
+                        Unterwegs
+                      </button>
+                    `
+                    : ""
+                }
+
+                ${
+                  order.status === "on_the_way"
+                    ? `
+                      <button
+                        class="btn green small"
+                        data-order-action="${order.id}|completed"
+                      >
+                        Erledigt
+                      </button>
+                    `
+                    : ""
+                }
+
+                ${
+                  ![
+                    "completed",
+                    "cancelled"
+                  ].includes(
+                    order.status
+                  )
+                    ? `
+                      <button
+                        class="btn red small"
+                        data-order-action="${order.id}|cancelled"
+                      >
+                        Stornieren
+                      </button>
+                    `
+                    : ""
+                }
+
+              </div>
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
+  root
+    .querySelectorAll(
+      "[data-order-action]"
+    )
+    .forEach(
+      button => {
+
+        button.onclick =
+        async () => {
+
+          const [
+            orderId,
+            status
+          ] =
+            button.dataset
+              .orderAction
+              .split("|");
+
+          try {
+
+            const body = {
+              orderId,
+              status
+            };
+
+            if (
+              status === "accepted"
+            ) {
+
+              body.deliveryMinutes =
+                Number(
+                  $(
+                    `time-${orderId}`
+                  ).value
+                );
+
+            }
+
+            button.disabled =
+              true;
+
+            await adminPost(
+              "admin-order",
+              body
+            );
+
+          } catch (error) {
+
+            alert(
+              error.message
+            );
+
+            button.disabled =
+              false;
+
+          }
+
+        };
+
+      }
+    );
+
+}
+
+
+function renderOrderOverview() {
+
+  const root =
+    $("orderOverview");
+
+  if (!cachedOrders.length) {
+
+    root.innerHTML =
+      `
+        <div class="card muted">
+          Noch keine Bestellungen vorhanden.
+        </div>
+      `;
+
+    return;
+  }
+
+  root.innerHTML =
+    `
+
+      <div class="card">
+
+        <h3>
+          Bestellübersicht
+        </h3>
+
+        <div class="muted">
+          Hier siehst du noch einmal genau,
+          wer was bestellt hat.
+        </div>
+
+      </div>
+
+    ` +
+    cachedOrders
+      .map(
+        order => {
+
+          return `
+
+            <div class="admin-order">
+
+              <div class="between">
+
+                <div>
+
+                  <strong>
+                    Bestellung
+                    #${order.orderNumber || order.id.slice(0,8)}
+                  </strong>
+
+                  <div class="muted">
+                    ${formatDate(
+                      order.createdAt ||
+                      order.createdAtClient
+                    )}
+                  </div>
+
+                </div>
+
+                <span class="status">
+                  ${statusName(
+                    order.status
+                  )}
+                </span>
+
+              </div>
+
+
+              ${customerHTML(order)}
+
+
+              <div class="order-detail">
+
+                <strong>
+                  Bestellung
+                </strong>
+
+                ${orderItemsHTML(order)}
+
+              </div>
+
+
+              ${totalsHTML(order)}
+
+
+              ${
+                order.deliveryMinutes
+                  ? `
+                    <div class="order-detail">
+                      <strong>
+                        Lieferzeit:
+                      </strong>
+                      ca.
+                      ${order.deliveryMinutes}
+                      Minuten
+                    </div>
+                  `
+                  : ""
+              }
+
+
+              ${
+                order.note
+                  ? `
+                    <div class="notice">
+                      <strong>
+                        Kundenhinweis:
+                      </strong>
+                      ${order.note}
+                    </div>
+                  `
+                  : ""
+              }
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
+}
+
+
+document
+  .querySelectorAll(
+    "[data-admin-tab]"
+  )
+  .forEach(
+    button => {
+
+      button.onclick =
+        () => {
+
+          document
+            .querySelectorAll(
+              ".admin-tab"
+            )
+            .forEach(
+              x =>
+                x.classList
+                  .remove(
+                    "active"
+                  )
+            );
+
+          button.classList.add(
+            "active"
+          );
+
+          const overview =
+            button.dataset.adminTab ===
+            "overview";
+
+          $("orders")
+            .classList
+            .toggle(
+              "hidden",
+              overview
+            );
+
+          $("orderOverview")
+            .classList
+            .toggle(
+              "hidden",
+              !overview
+            );
+
+        };
+
+    }
+  );
+
+
+document.addEventListener(
+  "dblclick",
+  event => {
+
+    if (
+      event.target.closest(
+        "button,.btn,[data-qty]"
+      )
+    ) {
+      event.preventDefault();
+    }
+
+  },
+  {
+    passive:false
+  }
+);
+
+
+let lastTouchEnd =
+  0;
+
+document.addEventListener(
+  "touchend",
+  event => {
+
+    if (
+      !event.target.closest(
+        "button,.btn,[data-qty]"
+      )
+    ) {
+      return;
+    }
+
+    const now =
+      Date.now();
+
+    if (
+      now -
+      lastTouchEnd <=
+      300
+    ) {
+      event.preventDefault();
+    }
+
+    lastTouchEnd =
+      now;
+
+  },
+  {
+    passive:false
+  }
+);
+
+
+renderMenu();
+renderStatus();
+refreshCart();
+renderLoyalty();
+showLastOrder();
+
+</script>
+
+</body>
+</html>
