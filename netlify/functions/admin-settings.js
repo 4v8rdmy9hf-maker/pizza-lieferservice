@@ -4,30 +4,51 @@ const {
   json
 } = require("./_firebase");
 
+
 exports.handler = async event => {
+
   if (event.httpMethod !== "POST") {
-    return json(405, {
-      error: "Methode nicht erlaubt"
-    });
+
+    return json(
+      405,
+      {
+        error:
+          "Methode nicht erlaubt"
+      }
+    );
+
   }
 
+
   try {
+
     await requireAdmin(event);
 
-    const body = JSON.parse(
-      event.body || "{}"
-    );
+
+    const body =
+      JSON.parse(
+        event.body || "{}"
+      );
+
 
     const update = {};
 
+
     if (
-      ["auto", "open", "closed"].includes(
+      [
+        "auto",
+        "open",
+        "closed"
+      ].includes(
         body.manualStatus
       )
     ) {
+
       update.manualStatus =
         body.manualStatus;
+
     }
+
 
     if (
       [
@@ -37,12 +58,34 @@ exports.handler = async event => {
         "90",
         "stop"
       ].includes(
-        String(body.capacity)
+        String(
+          body.capacity
+        )
       )
     ) {
+
       update.capacity =
-        String(body.capacity);
+        String(
+          body.capacity
+        );
+
     }
+
+
+    if (
+      Object.keys(update).length === 0
+    ) {
+
+      return json(
+        400,
+        {
+          error:
+            "Keine gültige Einstellung übergeben"
+        }
+      );
+
+    }
+
 
     await db
       .collection("settings")
@@ -54,20 +97,31 @@ exports.handler = async event => {
         }
       );
 
-    return json(200, {
-      ok: true
-    });
-
-  } catch (error) {
-    console.error(error);
 
     return json(
-      error.statusCode || 500,
+      200,
+      {
+        ok: true,
+        settings: update
+      }
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+
+    return json(
+      error.statusCode ||
+      500,
       {
         error:
           error.message ||
-          "Serverfehler"
+          "Einstellungen konnten nicht gespeichert werden"
       }
     );
+
   }
+
 };
